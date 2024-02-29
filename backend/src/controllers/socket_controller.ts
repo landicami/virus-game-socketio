@@ -14,4 +14,9 @@ export const handleConnection = (
 	io: Server<ClientToServerEvents, ServerToClientEvents>
 ) => {
 	debug("🙋 A user connected", socket.id);
+
+	socket.on("userJoinReq", (username, callback) => {
+		callback(true);
+		debug("User wants to joing", username)
+	})
 }
