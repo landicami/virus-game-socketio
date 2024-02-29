@@ -11,12 +11,16 @@ const SOCKET_HOST = import.meta.env.VITE_SOCKET_HOST;
 const userInput = document.querySelector("#nametag") as HTMLInputElement;
 const userSubmit = document.querySelector("#user-form") as HTMLFormElement;
 const startDiv = document.querySelector("#start") as HTMLDivElement;
+const gameDiv = document.querySelector("#game") as HTMLDivElement;
 
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST);
 
 let username: string | null = null; 
+
+startDiv.classList.remove("hide");
+gameDiv.classList.add("hide");
 
 // Listen for when connection is established
 socket.on("connect", () => {
@@ -53,5 +57,7 @@ userSubmit.addEventListener("submit", (e) => {
 		}
 		console.log("User has joined through back and front")
 	})
+	startDiv.classList.add("hide");
+	gameDiv.classList.remove("hide");
 
 });
