@@ -9,7 +9,8 @@ const SOCKET_HOST = import.meta.env.VITE_SOCKET_HOST;
 
 //DOM referenser
 const userInput = document.querySelector("#nametag") as HTMLInputElement;
-const userSubmit = document.querySelector("#join") as HTMLButtonElement;
+const userSubmit = document.querySelector("#user-form") as HTMLFormElement;
+const startDiv = document.querySelector("#start") as HTMLDivElement;
 
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
@@ -35,12 +36,14 @@ socket.io.on("reconnect", () => {
 });
 
 userSubmit.addEventListener("submit", (e) => {
-	e.preventDefault;
+	e.preventDefault();
+	
 	const trimmedUsername = userInput.value.trim();
-	username = trimmedUsername;
-	if(!username) {
+	if(!trimmedUsername) {
 		return;
 	}
+	username = trimmedUsername;
+	
 	console.log(username);
 
 	socket.emit("userJoinReq", username, (success) => {
@@ -51,4 +54,4 @@ userSubmit.addEventListener("submit", (e) => {
 		console.log("User has joined through back and front")
 	})
 
-})
+});
