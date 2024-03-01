@@ -9,22 +9,22 @@ datasource db {
 
 model Gameroom {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
-  name  String @unique
   users User[]
 }
 
 model User {
   id        String @id @map("_id") 
   username  String 
-  roomId    String @db.ObjectId
-  room      Gameroom @relation(fields: [roomId], references: [id])
+  roomId    String? @db.ObjectId
+  rounds    Int? 
+  room      Gameroom? @relation(fields: [roomId], references: [id])
   highscores Highscore[]
 }
 
 // Not complete, may have to change. This is just a example on highscore for now
 model Highscore {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
-  score     Int 
+  time      Int[]
   user      User @relation(fields: [userId], references: [id] )
   userId    String 
 }

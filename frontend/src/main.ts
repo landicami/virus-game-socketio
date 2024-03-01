@@ -50,8 +50,8 @@ userSubmit.addEventListener("submit", (e) => {
 	
 	console.log(username);
 
-	socket.emit("userJoinReq", username, (success) => {
-		if(!success){
+	socket.emit("userJoinReq", username, (callback) => {
+		if(!callback){
 			alert("GET THE HELL OUT OF MY FACE")
 			return;
 		}
