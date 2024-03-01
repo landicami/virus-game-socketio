@@ -4,9 +4,13 @@
 import Debug from "debug";
 import { Server, Socket } from "socket.io";
 import { ClientToServerEvents, ServerToClientEvents } from "@shared/types/SocketTypes";
+import prisma from "../prisma";
+import { createUserInput } from "@shared/types/Models"
 
 // Create a new debug instance
 const debug = Debug("backend:socket_controller");
+
+let playerCount: string[] = [];
 
 // Handle a user connecting
 export const handleConnection = (
@@ -15,8 +19,33 @@ export const handleConnection = (
 ) => {
 	debug("🙋 A user connected", socket.id);
 
-	socket.on("userJoinReq", (username, callback) => {
+	socket.on("userJoinReq", async (username, callback) => {
+		// playerCount.push(username);
+		// console.log(playerCount);
+
+		// if(!playerCount) {
+		// 	return;
+		// }
+		const newUser = await prisma.user.create({
+			data: {
+				id: socket.id,
+				username: username,
+
+			}
+		})
+		const allUsers = await prisma.user.findMany();
+		debug(allUsers.slice(0, 2));
+
 		callback(true);
-		debug("User wants to joing", username)
+		debug("User wants to join", username);
+
+
+		// const newUser: createUserInput = await prisma.user.create({
+		// 	data: {
+		// 		id: socket.id,
+		// 		username,
+		// 	}
+		// })
+
 	})
 }
