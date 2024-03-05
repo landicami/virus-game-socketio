@@ -7,5 +7,5 @@ export interface ServerToClientEvents {
 
 // Events emitted by the client to the server
 export interface ClientToServerEvents {
-    userJoinReq: (username: string, callback: (success: boolean, slumpatTal: number) => void) => void;
+    userJoinReq: (username: string, callback: (success: boolean, randomNumber: number, randomInterval: number) => void) => void;
 }

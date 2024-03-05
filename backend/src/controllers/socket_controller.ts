@@ -35,12 +35,14 @@ export const handleConnection = (
 		// })
 		// const allUsers = await prisma.user.findMany();
 		// debug(allUsers.slice(0, 2));
-		function slumpaTal() {
+		function randomNumber() {
 			return Math.floor(Math.random() * 25) + 1;
 		}
-		debug(slumpaTal());
+		const randomInterval = Math.floor(Math.random() * (8500 - 1500 + 1)) + 1500; // Slumpa ett tal mellan 1500 och 8500
 
-		callback(true, slumpaTal());
+		debug(randomNumber(), randomInterval);
+
+		callback(true, randomNumber(), randomInterval);
 		debug("User wants to join", username);
 
 
