@@ -15,6 +15,7 @@ const frontendDistPath = path.join(__dirname, NODE_ENV === "production"
 console.log("🌱 Environment:", NODE_ENV);
 console.log("🚚 Path to frontend build:", frontendDistPath);
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());

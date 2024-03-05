@@ -24,6 +24,9 @@ dist-ssr
 *.sw?
 
 
+<<<<<<< HEAD
+=======
 # Keep environment variables out of version control
 # (remove existing with `git rm --cached .env`)
+>>>>>>> main
 .env
