@@ -50,14 +50,33 @@ userSubmit.addEventListener("submit", (e) => {
 	
 	console.log(username);
 
-	socket.emit("userJoinReq", username, (callback) => {
+	socket.emit("userJoinReq", username, (callback, slumpatTal) => {
 		if(!callback){
 			alert("GET THE HELL OUT OF MY FACE")
 			return;
 		}
-		console.log("User has joined through back and front")
+		console.log("User has joined through back and front", callback, slumpatTal)
+		startDiv.classList.add("hide");
+		gameDiv.classList.remove("hide");
+
+	function matchaOchSättInnerHTML(slumpatTal: number) {
+    const divID = "div" + slumpatTal; 
+    const divElement = document.getElementById(divID) as HTMLDivElement; 
+
+    if (divElement) {
+			function slumpadFunktion() {
+			const slumpatIntervall = Math.floor(Math.random() * (8500 - 1500 + 1)) + 1500; // Slumpa ett tal mellan 1500 och 8500
+			console.log(slumpatIntervall);
+			setTimeout(function() {
+				divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+				console.log(divElement);
+			}, slumpatIntervall);
+		}
+	slumpadFunktion();
+    } else {
+        console.log("Kunde inte hitta element med ID: " + divID);
+    }}
+	matchaOchSättInnerHTML(slumpatTal);
 	})
-	startDiv.classList.add("hide");
-	gameDiv.classList.remove("hide");
 
 });

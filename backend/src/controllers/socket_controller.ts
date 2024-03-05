@@ -26,17 +26,21 @@ export const handleConnection = (
 		// if(!playerCount) {
 		// 	return;
 		// }
-		const newUser = await prisma.user.create({
-			data: {
-				id: socket.id,
-				username: username,
+		// const newUser = await prisma.user.create({
+		// 	data: {
+		// 		id: socket.id,
+		// 		username: username,
 
-			}
-		})
-		const allUsers = await prisma.user.findMany();
-		debug(allUsers.slice(0, 2));
+		// 	}
+		// })
+		// const allUsers = await prisma.user.findMany();
+		// debug(allUsers.slice(0, 2));
+		function slumpaTal() {
+			return Math.floor(Math.random() * 25) + 1;
+		}
+		debug(slumpaTal());
 
-		callback(true);
+		callback(true, slumpaTal());
 		debug("User wants to join", username);
 
 
@@ -49,3 +53,7 @@ export const handleConnection = (
 
 	})
 }
+
+
+
+
