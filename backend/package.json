@@ -7,7 +7,11 @@
     "build": "env-cmd --silent bash scripts/build.sh",
     "build-app": "tsc",
     "dev": "cross-env DEBUG=backend:*,socket.io:socket nodemon server.ts",
+<<<<<<< HEAD
     "start": "NODE_ENV=production node dist/backend/server.js"
+=======
+    "start": "NODE_ENV=production node"
+>>>>>>> main
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
