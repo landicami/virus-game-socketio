@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import {
   ClientToServerEvents,
+  RoomInfo,
   ServerToClientEvents,
 } from "@shared/types/SocketTypes";
 import "./assets/scss/style.scss";
@@ -60,8 +61,11 @@ userSubmit.addEventListener("submit", (e) => {
   });
 });
 
-socket.on("gameStart", (roomId: string) => {
-  console.log("starting game in", roomId);
+socket.on("gameStart", (room: RoomInfo) => {
+  console.log(`starting game in ${room.id} with users:`);
+  room.users.forEach((user) => {
+    console.log(`${user.username} (${user.id})`);
+  });
 
   startDiv.classList.add("hide");
   gameDiv.classList.remove("hide");

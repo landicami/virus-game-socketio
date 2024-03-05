@@ -69,7 +69,8 @@ export const handleConnection = (
 				// Detta eventet skickar bara till ovriga
 				// io.to(availableRoom.id).emit("userJoinedRoom", username);
 				// Ska vi skicka till alla?
-				io.to(availableRoom.id).emit("gameStart", availableRoom.id);
+				io.to(availableRoom.id).emit("gameStart", availableRoom);
+				debug(`This is the availableroomData;`, availableRoom.users);
 			} else {
 				// 3. Om det inte finns, skapa ett nytt rum och joina det
 
