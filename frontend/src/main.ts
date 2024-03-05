@@ -52,21 +52,33 @@ userSubmit.addEventListener("submit", (e) => {
 
   console.log(username);
 
-  socket.emit("userJoinReq", username, (callback) => {
-    if (!callback) {
-      alert("GET THE HELL OUT OF MY FACE");
-      return;
-    }
-    console.log("User has joined through back and front");
-  });
-});
+	socket.emit("userJoinReq", username, (callback, slumpatTal) => {
+		if(!callback){
+			alert("GET THE HELL OUT OF MY FACE")
+			return;
+		}
+		console.log("User has joined through back and front", callback, slumpatTal)
+		startDiv.classList.add("hide");
+		gameDiv.classList.remove("hide");
 
-socket.on("gameStart", (room: RoomInfo) => {
-  console.log(`starting game in ${room.id} with users:`);
-  room.users.forEach((user) => {
-    console.log(`${user.username} (${user.id})`);
-  });
+	function matchaOchSättInnerHTML(slumpatTal: number) {
+    const divID = "div" + slumpatTal; 
+    const divElement = document.getElementById(divID) as HTMLDivElement; 
 
-  startDiv.classList.add("hide");
-  gameDiv.classList.remove("hide");
+    if (divElement) {
+			function slumpadFunktion() {
+			const slumpatIntervall = Math.floor(Math.random() * (8500 - 1500 + 1)) + 1500; // Slumpa ett tal mellan 1500 och 8500
+			console.log(slumpatIntervall);
+			setTimeout(function() {
+				divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+				console.log(divElement);
+			}, slumpatIntervall);
+		}
+	slumpadFunktion();
+    } else {
+        console.log("Kunde inte hitta element med ID: " + divID);
+    }}
+	matchaOchSättInnerHTML(slumpatTal);
+	})
+
 });
