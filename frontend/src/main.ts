@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import {
   ClientToServerEvents,
+  RoomInfo,
   ServerToClientEvents,
 } from "@shared/types/SocketTypes";
 import "./assets/scss/style.scss";
@@ -20,11 +21,24 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
   io(SOCKET_HOST);
 
 let username: string | null = null;
+let startTime: number;
+let virusPressed: number;
 
 startDiv.classList.remove("hide");
 gameDiv.classList.add("hide");
-waitingDiv.classList.add("hide");
 
+const startTimer = () => {
+  startTime = Date.now();
+  console.log(startTime);
+  return startTime;
+  // return (startTime = Date.now());
+};
+const virusClicked = () => {
+  const endTime = Date.now();
+  const timeTaken = endTime - startTime;
+  console.log("timeTaken is: ", timeTaken);
+  return timeTaken;
+};
 
 // Listen for when connection is established
 socket.on("connect", () => {
@@ -60,16 +74,38 @@ userSubmit.addEventListener("submit", (e) => {
 
   }
 
-  socket.emit("userJoinReq", username, (callback) => {
-    if (!callback) {
-      alert("GET THE HELL OUT OF MY FACE");
-      return;
-    }
-    console.log("User has joined through back and front", username);
-   
+  socket.emit("userJoinReq", username,(callback, randomNumber, randomInterval) => {
+      if (!callback) {
+        alert("GET THE HELL OUT OF MY FACE");
+        return;
+      }
+      console.log("User has joined through back and front", callback, randomNumber, randomInterval);
+      startDiv.classList.add("hide");
+      gameDiv.classList.remove("hide");
 
-    
-  });
+      function getDivandPutvirus(randomNumber: number) {
+        const divID = "div" + randomNumber;
+        const divElement = document.getElementById(divID) as HTMLDivElement;
+
+        if (divElement) {
+          setTimeout(function () {
+            divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+            console.log(divElement);
+            startTimer();
+            divElement.addEventListener("click", () => {
+              // const virusPressed = virusClicked();
+              virusClicked();
+              socket.emit("virusClick", (virusPressed = virusClicked()));
+            });
+          }, randomInterval);
+        } else {
+          console.log("Kunde inte hitta element med ID: " + divID);
+        }
+      }
+      getDivandPutvirus(randomNumber);
+    }
+  );
+});
 
   socket.on("gameStart", (gameroom) => {
     console.log("Now the game will start, with the", gameroom);
@@ -77,4 +113,3 @@ userSubmit.addEventListener("submit", (e) => {
     gameDiv.classList.remove("hide");
     
   });
-});
