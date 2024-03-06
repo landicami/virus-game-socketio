@@ -12,7 +12,7 @@ const userInput = document.querySelector("#nametag") as HTMLInputElement;
 const userSubmit = document.querySelector("#user-form") as HTMLFormElement;
 const startDiv = document.querySelector("#start") as HTMLDivElement;
 const gameDiv = document.querySelector("#game") as HTMLDivElement;
-const waitingDiv = document.querySelector("#waiting") as HTMLDivElement;
+const waitingDiv = document.querySelector(".waiting") as HTMLDivElement;
 
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
@@ -53,23 +53,28 @@ userSubmit.addEventListener("submit", (e) => {
   username = trimmedUsername;
 
   console.log(username);
-  // if(username) {
-  //   startDiv.classList.add("hide");
-  //   waitingDiv.classList.remove("hide");
+  if(username) {
+    startDiv.classList.add("hide");
+    gameDiv.classList.add("hide");
+    waitingDiv.classList.remove("hide");
 
-  // }
+  }
 
   socket.emit("userJoinReq", username, (callback) => {
     if (!callback) {
       alert("GET THE HELL OUT OF MY FACE");
       return;
     }
-    console.log("User has joined through back and front");
+    console.log("User has joined through back and front", username);
+   
 
-    socket.on("gameStart", (users) => {
-      console.log("Now the game will start, with the", users);
-      startDiv.classList.add("hide");
-      gameDiv.classList.remove("hide");
-    });
+    
+  });
+
+  socket.on("gameStart", (gameroom) => {
+    console.log("Now the game will start, with the", gameroom);
+     waitingDiv.classList.add("hide");
+    gameDiv.classList.remove("hide");
+    
   });
 });

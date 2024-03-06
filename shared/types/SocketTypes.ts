@@ -2,7 +2,7 @@ export {}
 
 // Events emitted by the server to the client
 export interface ServerToClientEvents {
-    gameStart: (users: string[]) => void;
+    gameStart: (gameroom: GameRoomInterface) => void;
 
 }
 

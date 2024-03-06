@@ -30,12 +30,21 @@ socket.on("userJoinReq", async (username, callback) => {
 if (existingRoom) {
     // Om ett rum med färre än 2 användare finns, lägg till användaren till detta rum
     existingRoom.users.push(username);
+	let anotherUser = await prisma.user.create({
+        data: {
+            id: socket.id,
+            username: username,
+            roomId: existingRoom.id
+        },
+    });
+	debug("This is anotherUser", anotherUser)
+
     debug("Användare tillagd i befintligt rum:", existingRoom);
     // Om det befintliga rummet nu har 2 användare, skicka en händelse för att meddela att spelet kan börja
     if (existingRoom.users.length === 2) {
 		socket.join(existingRoom.id);
 
-    	io.to(existingRoom.id).emit("gameStart", existingRoom.users);
+    	io.to(existingRoom.id).emit("gameStart", existingRoom);
 		 // Lägg till anslutningen till rummet
     }
 	debug("Sent to", existingRoom);
@@ -61,8 +70,9 @@ if (existingRoom) {
         id: newRoom.id,
         users: [username]
     });
+	callback(true);
+
 }
-callback(true);
 
 });
 }
