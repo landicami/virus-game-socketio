@@ -51,7 +51,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			 // Lägg till anslutningen till rummet
 		}
-		debug("Sent to", existingRoom);
+		debug("Sent to", existingRoom.id);
 		} else {
 		// Om inget rum med färre än 2 användare finns, skapa ett nytt rum
 		let newRoom = await prisma.gameroom.create({
@@ -74,6 +74,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			id: newRoom.id,
 			users: [username]
 		});
+		socket.join(newRoom.id);
+		debug("the newroomid", newRoom.id)
 	}
 
 	});
