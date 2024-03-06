@@ -46,8 +46,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		if (existingRoom.users.length === 2) {
 			socket.join(existingRoom.id);
 
-			io.to(existingRoom.id).emit("gameStart", existingRoom);
-			callback(true, randomNumber(), randomInterval);
+			io.to(existingRoom.id).emit("gameStart", existingRoom, randomNumber(), randomInterval);
+			callback(true);
 
 			 // Lägg till anslutningen till rummet
 		}
