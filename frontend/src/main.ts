@@ -96,6 +96,7 @@ userSubmit.addEventListener("submit", (e) => {
             divElement.addEventListener("click", () => {
               // const virusPressed = virusClicked();
               virusClicked();
+              socket.emit("virusClick", (virusPressed = virusClicked()));
             });
           }, randomInterval);
         } else {
@@ -105,5 +106,4 @@ userSubmit.addEventListener("submit", (e) => {
       getDivandPutvirus(randomNumber);
     }
   );
-  socket.emit("virusClick", (virusPressed = virusClicked()));
 });

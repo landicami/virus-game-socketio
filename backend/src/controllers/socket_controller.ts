@@ -101,7 +101,7 @@ export const handleConnection = (
 	});
 
 	socket.on("virusClick", (virusPressed: number) => {
-		debug("What happens?", virusPressed);
+		debug("Time it took to click", virusPressed.toFixed(1));
 	});
 };
 
