@@ -20,9 +20,24 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
   io(SOCKET_HOST);
 
 let username: string | null = null;
+let startTime: number;
+let virusPressed: number;
 
 startDiv.classList.remove("hide");
 gameDiv.classList.add("hide");
+
+const startTimer = () => {
+  startTime = Date.now();
+  console.log(startTime);
+  return startTime;
+  // return (startTime = Date.now());
+};
+const virusClicked = () => {
+  const endTime = Date.now();
+  const timeTaken = endTime - startTime;
+  console.log("timeTaken is: ", timeTaken);
+  return timeTaken;
+};
 
 // Listen for when connection is established
 socket.on("connect", () => {
@@ -52,29 +67,43 @@ userSubmit.addEventListener("submit", (e) => {
 
   console.log(username);
 
-	socket.emit("userJoinReq", username, (callback, randomNumber, randomInterval) => {
-		if(!callback){
-			alert("GET THE HELL OUT OF MY FACE")
-			return;
-		}
-		console.log("User has joined through back and front", callback, randomNumber, randomInterval)
-		startDiv.classList.add("hide");
-		gameDiv.classList.remove("hide");
+  socket.emit(
+    "userJoinReq",
+    username,
+    (callback, randomNumber, randomInterval) => {
+      if (!callback) {
+        alert("GET THE HELL OUT OF MY FACE");
+        return;
+      }
+      console.log(
+        "User has joined through back and front",
+        callback,
+        randomNumber,
+        randomInterval
+      );
+      startDiv.classList.add("hide");
+      gameDiv.classList.remove("hide");
 
-	function getDivandPutvirus(randomNumber: number) {
-    const divID = "div" + randomNumber; 
-    const divElement = document.getElementById(divID) as HTMLDivElement; 
+      function getDivandPutvirus(randomNumber: number) {
+        const divID = "div" + randomNumber;
+        const divElement = document.getElementById(divID) as HTMLDivElement;
 
-    if (divElement) {
-			setTimeout(function() {
-				divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
-				console.log(divElement);
-			}, randomInterval);
-	
-    } else {
-        console.log("Kunde inte hitta element med ID: " + divID);
-    }}
-	getDivandPutvirus(randomNumber);
-	})
-
+        if (divElement) {
+          setTimeout(function () {
+            divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+            console.log(divElement);
+            startTimer();
+            divElement.addEventListener("click", () => {
+              // const virusPressed = virusClicked();
+              virusClicked();
+            });
+          }, randomInterval);
+        } else {
+          console.log("Kunde inte hitta element med ID: " + divID);
+        }
+      }
+      getDivandPutvirus(randomNumber);
+    }
+  );
+  socket.emit("virusClick", (virusPressed = virusClicked()));
 });

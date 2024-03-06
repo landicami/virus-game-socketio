@@ -35,14 +35,15 @@ export const handleConnection = (
 			debug(slumpaTal());
 
 			function randomNumber() {
-			return Math.floor(Math.random() * 25) + 1;
-		}
-		const randomInterval = Math.floor(Math.random() * (8500 - 1500 + 1)) + 1500; // Slumpa ett tal mellan 1500 och 8500
+				return Math.floor(Math.random() * 25) + 1;
+			}
+			const randomInterval =
+				Math.floor(Math.random() * (8500 - 1500 + 1)) + 1500; // Slumpa ett tal mellan 1500 och 8500
 
-		debug(randomNumber(), randomInterval);
+			debug(randomNumber(), randomInterval);
 
-		callback(true, randomNumber(), randomInterval);
-		debug("User wants to join", username);
+			callback(true, randomNumber(), randomInterval);
+			debug("User wants to join", username);
 
 			// 1. Hitta ett rum som bara har en user
 
@@ -98,6 +99,10 @@ export const handleConnection = (
 			callback(false, 0, 0);
 		}
 	});
+
+	socket.on("virusClick", (virusPressed: number) => {
+		debug("What happens?", virusPressed);
+	});
 };
 
 const createRoom = async (userId: string) => {
@@ -127,23 +132,21 @@ const createRoom = async (userId: string) => {
 // playerCount.push(username);
 // console.log(playerCount);
 
-		// if(!playerCount) {
-		// 	return;
-		// }
-		// const newUser = await prisma.user.create({
-		// 	data: {
-		// 		id: socket.id,
-		// 		username: username,
+// if(!playerCount) {
+// 	return;
+// }
+// const newUser = await prisma.user.create({
+// 	data: {
+// 		id: socket.id,
+// 		username: username,
 // if(!playerCount) {
 // 	return;
 // }
 
-		// 	}
-		// })
-		// const allUsers = await prisma.user.findMany();
-		// debug(allUsers.slice(0, 2));
-
-
+// 	}
+// })
+// const allUsers = await prisma.user.findMany();
+// debug(allUsers.slice(0, 2));
 
 /**
  * Now i want to look for users in the "waiting" area. As soon as there is two users, take those two
@@ -160,8 +163,3 @@ const createRoom = async (userId: string) => {
 // Första spelare joinar > skapa spelrum > socket.join
 // Andra spelare joinar > leta efter lediga rum > hittar inget med mindre än 2 spelare > socket.join
 // Tredje spelare joinar > letar efter lediga rum > hittar inte > skapa spelrum > socket.join
-
-
-
-
-
