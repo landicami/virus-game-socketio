@@ -52,7 +52,7 @@ function getDivandPutvirus(virusShow: number, virusInterval: number) {
       divElement.addEventListener("click", () => {
         virusPressed = virusClicked();
         // virusClicked();
-        socket.emit("virusClick", (virusPressed));
+        socket.emit("virusClick", virusPressed);
       });
     }, virusInterval);
   } else {
@@ -87,36 +87,33 @@ userSubmit.addEventListener("submit", (e) => {
   username = trimmedUsername;
 
   console.log(username);
-  if(username) {
+  if (username) {
     startDiv.classList.add("hide");
     gameDiv.classList.add("hide");
     waitingDiv.classList.remove("hide");
-
   }
 
-  socket.emit("userJoinReq", username,(callback) => {
-      if (!callback) {
-        alert("GET THE HELL OUT OF MY FACE");
-        return;
-      }
-      console.log("User has joined through back and front", callback);
-      
+  socket.emit("userJoinReq", username, (callback) => {
+    if (!callback) {
+      alert("GET THE HELL OUT OF MY FACE");
+      return;
     }
-  );
+    console.log("User has joined through back and front", callback);
+  });
 });
 
-  socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
-    console.log("Now the game will start, with the", gameroom);
-    console.log(`Virus will appear in div${virusShow} within ${virusInterval} seconds`);
-    if(gameroom.users.length === 2){
+socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
+  console.log("Now the game will start, with the", gameroom);
+  console.log(
+    `Virus will appear in div${virusShow} within ${virusInterval} seconds`
+  );
+  if (gameroom.users.length === 2) {
     startDiv.classList.add("hide");
     waitingDiv.classList.add("hide");
     gameDiv.classList.remove("hide");
 
-    
     getDivandPutvirus(virusShow, virusInterval);
   } else {
     waitingDiv.classList.remove("hide");
   }
-    
-  });
+});
