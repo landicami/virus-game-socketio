@@ -118,7 +118,9 @@ userSubmit.addEventListener("submit", (e) => {
           divElement.innerHTML = `<span class="knife" id="virusEmoji">&#129503;</span>`;
           console.log(divElement);
           startTimer();
+          startStoptimer();
           divElement.addEventListener("click", () => {
+            startStoptimer();
             virusPressed = virusClicked();
             // virusClicked();
             socket.emit("virusClick", (virusPressed));
@@ -135,56 +137,41 @@ userSubmit.addEventListener("submit", (e) => {
     
   });
 
-  //stopwatch
+//stopwatch
 
-let timer: any = null;
+let timer: number = 0;
 let isRunning = false;
+let milliseconds = 0;
 let seconds = 0;
-let minutes = 0;
-let hours = 0;
 
-const startStopButton = document.querySelector("#startStopButton") as HTMLButtonElement;
 const display = document.querySelector('#display') as HTMLHeadingElement;
-const resetButton = document.querySelector('#resetButton') as HTMLButtonElement;
 
-function startStop() {
+function startStoptimer() {
     if (!isRunning) {
-        timer = setInterval(runStopwatch, 1000);
-        startStopButton.innerHTML = 'Stop';
+        timer = setInterval(runStopwatch, 10);
         isRunning = true;
     } else {
         clearInterval(timer);
-        startStopButton.innerHTML = 'Start';
         isRunning = false;
     }
 }
 
 function runStopwatch() {
-    seconds++;
-    if (seconds === 60) {
-        seconds = 0;
-        minutes++;
-        if (minutes === 60) {
-            minutes = 0;
-            hours++;
-        }
-    }
-
-    display.innerHTML = 
-        (hours < 10 ? '0' + hours : hours) + ':' + 
-        (minutes < 10 ? '0' + minutes : minutes) + ':' + 
-        (seconds < 10 ? '0' + seconds : seconds);
+  milliseconds++;
+  if (milliseconds === 100) {
+      milliseconds = 0;
+      seconds++;
+  }
+  display.innerHTML = 
+      (seconds < 10 ? '0' + seconds : seconds) + '.' + 
+      (milliseconds < 10 ? '00' + milliseconds : milliseconds < 100 ? '0' + milliseconds : milliseconds);
 }
 
-function reset() {
-    clearInterval(timer);
-    isRunning = false;
-    seconds = 0;
-    minutes = 0;
-    hours = 0;
-    display.innerHTML = '00:00:00';
-    startStopButton.innerHTML = 'Start';
+function resetTimer() {
+  clearInterval(timer);
+  isRunning = false;
+  milliseconds = 0;
+  seconds = 0;
+  display.innerHTML = '00:00:00';
 }
 
-startStopButton.addEventListener('click', startStop);
-resetButton.addEventListener('click', reset);
