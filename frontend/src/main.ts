@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import {
   ClientToServerEvents,
-  RoomInfo,
+  // RoomInfo,
   ServerToClientEvents,
 } from "@shared/types/SocketTypes";
 import "./assets/scss/style.scss";
