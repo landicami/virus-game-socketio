@@ -11,8 +11,14 @@
   display: none;
 }
 
+#highscoreUl {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
 #start {
-  margin: 5rem auto;
+  margin: 3rem;
   height: 50vh;
   width: 50vw;
   border: 1px solid black;
@@ -20,7 +26,7 @@
 }
 
 .waiting {
-  margin: 5rem auto;
+  margin: 4rem auto;
   border: 1px solid black;
   background-color: rgba(85, 107, 47, 0.5);
 }
@@ -46,7 +52,12 @@
   width: 50%;
 }
 #game {
-  height: 20rem;
+  height: 30rem;
+  // cursor: crosshair;
+}
+
+.knife{
+  cursor: pointer;
 }
 
 .rowgame {
@@ -54,5 +65,17 @@
 }
 
 #virusEmoji {
-  font-size: 2rem;
+  font-size: 3rem;
+}
+
+p {
+  font-size: large;
+}
+
+.playerOne {
+  color: darkblue;
+}
+
+.playerTwo {
+  color: darkmagenta;
 }

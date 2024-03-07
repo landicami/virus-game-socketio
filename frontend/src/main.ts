@@ -14,6 +14,7 @@ const userSubmit = document.querySelector("#user-form") as HTMLFormElement;
 const startDiv = document.querySelector("#start") as HTMLDivElement;
 const gameDiv = document.querySelector("#game") as HTMLDivElement;
 const waitingDiv = document.querySelector(".waiting") as HTMLDivElement;
+const highscoreDiv = document.querySelector(".highscoreDiv") as HTMLDivElement;
 
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
@@ -26,6 +27,8 @@ let virusPressed: number;
 
 startDiv.classList.remove("hide");
 gameDiv.classList.add("hide");
+highscoreDiv.classList.remove("hide");
+waitingDiv.classList.add("hide");
 
 const startTimer = () => {
   startTime = Date.now();
@@ -46,7 +49,7 @@ function getDivandPutvirus(virusShow: number, virusInterval: number) {
 
   if (divElement) {
     setTimeout(function () {
-      divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+      divElement.innerHTML = `<span class="knife" id="virusEmoji">&#129503;</span>`;
       console.log(divElement);
       startTimer();
       divElement.addEventListener("click", () => {
@@ -111,6 +114,7 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
     startDiv.classList.add("hide");
     waitingDiv.classList.add("hide");
     gameDiv.classList.remove("hide");
+    highscoreDiv.classList.add("hide");
 
     getDivandPutvirus(virusShow, virusInterval);
   } else {
