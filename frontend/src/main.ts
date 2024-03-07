@@ -43,25 +43,7 @@ const virusClicked = () => {
   return timeTaken;
 };
 
-function getDivandPutvirus(virusShow: number, virusInterval: number) {
-  const divID = "div" + virusShow;
-  const divElement = document.getElementById(divID) as HTMLDivElement;
 
-  if (divElement) {
-    setTimeout(function () {
-      divElement.innerHTML = `<span class="knife" id="virusEmoji">&#129503;</span>`;
-      console.log(divElement);
-      startTimer();
-      divElement.addEventListener("click", () => {
-        virusPressed = virusClicked();
-        // virusClicked();
-        socket.emit("virusClick", (virusPressed));
-      });
-    }, virusInterval);
-  } else {
-    console.log("Kunde inte hitta element med ID: " + divID);
-  }
-}
 
 // Listen for when connection is established
 socket.on("connect", () => {
@@ -117,7 +99,35 @@ userSubmit.addEventListener("submit", (e) => {
     gameDiv.classList.remove("hide");
     highscoreDiv.classList.add("hide");
 
+    const playerOneParagraph = document.querySelector(".playerOne") as HTMLParagraphElement;
+    const playerTwoParagraph = document.querySelector(".playerTwo") as HTMLParagraphElement;
+
+    const players = gameroom.users;
+    const playerOne = gameroom.users[0];
+    const playerTwo = gameroom.users[1];
+    playerOneParagraph.innerText = playerOne;
+    playerTwoParagraph.innerText = playerTwo;
+    console.log(players, playerOne, playerTwo);
+
+    function getDivandPutvirus(virusShow: number, virusInterval: number) {
+      const divID = "div" + virusShow;
+      const divElement = document.getElementById(divID) as HTMLDivElement;
     
+      if (divElement) {
+        setTimeout(function () {
+          divElement.innerHTML = `<span class="knife" id="virusEmoji">&#129503;</span>`;
+          console.log(divElement);
+          startTimer();
+          divElement.addEventListener("click", () => {
+            virusPressed = virusClicked();
+            // virusClicked();
+            socket.emit("virusClick", (virusPressed));
+          });
+        }, virusInterval);
+      } else {
+        console.log("Kunde inte hitta element med ID: " + divID);
+      }
+    }
     getDivandPutvirus(virusShow, virusInterval);
   } else {
     waitingDiv.classList.remove("hide");
