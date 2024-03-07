@@ -3,13 +3,17 @@
  */
 import Debug from "debug";
 import { Server, Socket } from "socket.io";
-import { ClientToServerEvents, GameRoomInterface, ServerToClientEvents } from "@shared/types/SocketTypes";
+import {
+	ClientToServerEvents,
+	GameRoomInterface,
+	ServerToClientEvents,
+} from "@shared/types/SocketTypes";
 import prisma from "../prisma";
 import { createUserInput } from "@shared/types/Models";
+import { userInfo } from "os";
 
 // Create a new debug instance
 const debug = Debug("backend:socket_controller");
-
 
 let activeGameRooms: GameRoomInterface[] = [];
 function randomNumber() {
@@ -20,144 +24,146 @@ const randomInterval = Math.floor(Math.random() * (8500 - 1500 + 1)) + 1500; // 
 debug(randomNumber(), randomInterval);
 
 // Handle a user connecting
-export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>,
-	io: Server<ClientToServerEvents, ServerToClientEvents>) => {
+export const handleConnection = (
+	socket: Socket<ClientToServerEvents, ServerToClientEvents>,
+	io: Server<ClientToServerEvents, ServerToClientEvents>
+) => {
 	debug("🙋 A user connected", socket.id);
 	socket.on("userJoinReq", async (username, callback) => {
 		debug("Användare vill ansluta", username);
 
 		// Hitta ett befintligt rum med färre än 2 användare
-		let existingRoom = activeGameRooms.find(room => room.users.length < 2);
+		let existingRoom = activeGameRooms.find(
+			(room) => room.users.length < 2
+		);
 
-	if (existingRoom) {
-		// Om ett rum med färre än 2 användare finns, lägg till användaren till detta rum
-		existingRoom.users.push(username);
-		let anotherUser = await prisma.user.create({
-			data: {
-				id: socket.id,
-				username: username,
-				roomId: existingRoom.id
-			},
-		});
-		debug("This is anotherUser", anotherUser)
+		if (existingRoom) {
+			// Om ett rum med färre än 2 användare finns, lägg till användaren till detta rum
+			existingRoom.users.push(username);
+			let anotherUser = await prisma.user.create({
+				data: {
+					id: socket.id,
+					username: username,
+					roomId: existingRoom.id,
+				},
+			});
+			debug("This is anotherUser", anotherUser);
 
-		debug("Användare tillagd i befintligt rum:", existingRoom);
-		// Om det befintliga rummet nu har 2 användare, skicka en händelse för att meddela att spelet kan börja
-		if (existingRoom.users.length === 2) {
-			socket.join(existingRoom.id);
+			debug("Användare tillagd i befintligt rum:", existingRoom);
+			// Om det befintliga rummet nu har 2 användare, skicka en händelse för att meddela att spelet kan börja
+			if (existingRoom.users.length === 2) {
+				socket.join(existingRoom.id);
 
-			io.to(existingRoom.id).emit("gameStart", existingRoom, randomNumber(), randomInterval);
-			callback(true);
+				io.to(existingRoom.id).emit(
+					"gameStart",
+					existingRoom,
+					randomNumber(),
+					randomInterval
+				);
+				callback(true);
 
-			 // Lägg till anslutningen till rummet
-		}
-		debug("Sent to", existingRoom.id);
-		} else {
-		// Om inget rum med färre än 2 användare finns, skapa ett nytt rum
-		let newRoom = await prisma.gameroom.create({
-			data: {}
-		});
-		debug("Nytt rum skapat:", newRoom);
-
-		// Lägg till användaren i det nya rummet
-		let newUser = await prisma.user.create({
-			data: {
-				id: socket.id,
-				username: username,
-				roomId: newRoom.id
+				// Lägg till anslutningen till rummet
 			}
-		});
-		debug("Användare tillagd i det nya rummet:", newUser);
+			debug("Sent to", existingRoom.id);
+		} else {
+			// Om inget rum med färre än 2 användare finns, skapa ett nytt rum
+			let newRoom = await prisma.gameroom.create({
+				data: {},
+			});
+			debug("Nytt rum skapat:", newRoom);
 
-		// Lägg till det nya rummet i listan med aktiva rum
-		activeGameRooms.push({
-			id: newRoom.id,
-			users: [username]
-		});
-		socket.join(newRoom.id);
-		debug("the newroomid", newRoom.id)
-	}
+			// Lägg till användaren i det nya rummet
+			let newUser = await prisma.user.create({
+				data: {
+					id: socket.id,
+					username: username,
+					roomId: newRoom.id,
+				},
+			});
+			debug("Användare tillagd i det nya rummet:", newUser);
 
+			// Lägg till det nya rummet i listan med aktiva rum
+			activeGameRooms.push({
+				id: newRoom.id,
+				users: [username],
+			});
+			socket.join(newRoom.id);
+			debug("the newroomid", newRoom.id);
+		}
 	});
-	socket.on("virusClick", (virusPressed: number) => {
+	socket.on("virusClick", async (virusPressed: number) => {
 		debug("Time it took to click", virusPressed.toFixed(1));
 	});
 };
 
-
-
 // Skapa en global array för att hålla reda på aktiva rum
 
-	// socket.on("userJoinReq", async (username, callback) => {
-		// try {
-		// 	const newUser = await prisma.user.create({
-		// 		data: {
-		// 			username: username,
-		// 		},
-		// 	});
-		// 	function slumpaTal() {
-		// 		return Math.floor(Math.random() * 25) + 1;
-		// 	}
-		// 	debug(slumpaTal());
+// socket.on("userJoinReq", async (username, callback) => {
+// try {
+// 	const newUser = await prisma.user.create({
+// 		data: {
+// 			username: username,
+// 		},
+// 	});
+// 	function slumpaTal() {
+// 		return Math.floor(Math.random() * 25) + 1;
+// 	}
+// 	debug(slumpaTal());
 
+// 1. Hitta ett rum som bara har en user
 
+// const gameRooms = await prisma.gameroom.findMany({
+// 	include: {
+// 		users: true,
+// 	},
+// });
 
-			// 1. Hitta ett rum som bara har en user
+// console.log("Game rooms:", gameRooms);
 
-			// const gameRooms = await prisma.gameroom.findMany({
-			// 	include: {
-			// 		users: true,
-			// 	},
-			// });
+// const availableRoom = gameRooms.find(
+// 	(room) => room.users.length === 1
+// );
 
-			// console.log("Game rooms:", gameRooms);
+// console.log("Available room:", availableRoom);
 
-			// const availableRoom = gameRooms.find(
-			// 	(room) => room.users.length === 1
-			// );
+// 		// 2. Om det finns, joina rummet
+// 		if (availableRoom) {
+// 			await prisma.gameroom.update({
+// 				where: {
+// 					id: availableRoom.id,
+// 				},
+// 				data: {
+// 					users: {
+// 						connect: {
+// 							id: newUser.id,
+// 						},
+// 					},
+// 				},
+// 			}); // Hur skriver vi detta?
 
-			// console.log("Available room:", availableRoom);
+// 			// Add user to socket
+// 			socket.join(availableRoom.id);
+// 			// Emitta event till socket(?) med roomId
+// 			// Detta eventet skickar bara till ovriga
+// 			// io.to(availableRoom.id).emit("userJoinedRoom", username);
+// 			// Ska vi skicka till alla?
+// 			io.to(availableRoom.id).emit("gameStart", availableRoom);
+// 			debug(`This is the availableroomData;`, availableRoom.users);
+// 		} else {
+// 			// 3. Om det inte finns, skapa ett nytt rum och joina det
 
-	// 		// 2. Om det finns, joina rummet
-	// 		if (availableRoom) {
-	// 			await prisma.gameroom.update({
-	// 				where: {
-	// 					id: availableRoom.id,
-	// 				},
-	// 				data: {
-	// 					users: {
-	// 						connect: {
-	// 							id: newUser.id,
-	// 						},
-	// 					},
-	// 				},
-	// 			}); // Hur skriver vi detta?
+// 			const newRoom = await createRoom(newUser.id);
 
-	// 			// Add user to socket
-	// 			socket.join(availableRoom.id);
-	// 			// Emitta event till socket(?) med roomId
-	// 			// Detta eventet skickar bara till ovriga
-	// 			// io.to(availableRoom.id).emit("userJoinedRoom", username);
-	// 			// Ska vi skicka till alla?
-	// 			io.to(availableRoom.id).emit("gameStart", availableRoom);
-	// 			debug(`This is the availableroomData;`, availableRoom.users);
-	// 		} else {
-	// 			// 3. Om det inte finns, skapa ett nytt rum och joina det
+// 			console.log("New room created:", newRoom);
 
-	// 			const newRoom = await createRoom(newUser.id);
-
-	// 			console.log("New room created:", newRoom);
-
-	// 			socket.join(newRoom.id);
-	// 		}
-	// 		// debug("User wants to join", username);
-	// 	} catch (error) {
-	// 		console.error("Error while handling userJoinReq", error);
-	// 		callback(false, 0, 0);
-	// 	}
-	// });
-
-
+// 			socket.join(newRoom.id);
+// 		}
+// 		// debug("User wants to join", username);
+// 	} catch (error) {
+// 		console.error("Error while handling userJoinReq", error);
+// 		callback(false, 0, 0);
+// 	}
+// });
 
 // const createRoom = async (userId: string) => {
 // 	const newRoom = await prisma.gameroom.create({
