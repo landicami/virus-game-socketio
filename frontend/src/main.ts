@@ -134,3 +134,57 @@ userSubmit.addEventListener("submit", (e) => {
   }
     
   });
+
+  //stopwatch
+
+let timer: any = null;
+let isRunning = false;
+let seconds = 0;
+let minutes = 0;
+let hours = 0;
+
+const startStopButton = document.querySelector("#startStopButton") as HTMLButtonElement;
+const display = document.querySelector('#display') as HTMLHeadingElement;
+const resetButton = document.querySelector('#resetButton') as HTMLButtonElement;
+
+function startStop() {
+    if (!isRunning) {
+        timer = setInterval(runStopwatch, 1000);
+        startStopButton.innerHTML = 'Stop';
+        isRunning = true;
+    } else {
+        clearInterval(timer);
+        startStopButton.innerHTML = 'Start';
+        isRunning = false;
+    }
+}
+
+function runStopwatch() {
+    seconds++;
+    if (seconds === 60) {
+        seconds = 0;
+        minutes++;
+        if (minutes === 60) {
+            minutes = 0;
+            hours++;
+        }
+    }
+
+    display.innerHTML = 
+        (hours < 10 ? '0' + hours : hours) + ':' + 
+        (minutes < 10 ? '0' + minutes : minutes) + ':' + 
+        (seconds < 10 ? '0' + seconds : seconds);
+}
+
+function reset() {
+    clearInterval(timer);
+    isRunning = false;
+    seconds = 0;
+    minutes = 0;
+    hours = 0;
+    display.innerHTML = '00:00:00';
+    startStopButton.innerHTML = 'Start';
+}
+
+startStopButton.addEventListener('click', startStop);
+resetButton.addEventListener('click', reset);
