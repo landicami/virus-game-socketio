@@ -50,9 +50,9 @@ function getDivandPutvirus(virusShow: number, virusInterval: number) {
       console.log(divElement);
       startTimer();
       divElement.addEventListener("click", () => {
-        // const virusPressed = virusClicked();
+        virusPressed = virusClicked();
         // virusClicked();
-        socket.emit("virusClick", (virusPressed = virusClicked()));
+        socket.emit("virusClick", (virusPressed));
       });
     }, virusInterval);
   } else {
