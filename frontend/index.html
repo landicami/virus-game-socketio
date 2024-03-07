@@ -18,7 +18,7 @@
 <body class="bg-warning creepster-regular">
   <div id="app container">
     <div class="container d-flex wrapper">
-      <div class=" col-2 highscore">
+      <div class=" col-4 highscoreDiv mt-5">
           <h2>Highscore</h2>
           <ul id="highscoreUl">
             <li>
@@ -31,7 +31,7 @@
       <div id = "Welcome">
           <h1 id="welcomeHeading">Welcome! </h1>
           <br>
-          <p id="welcomeParagraph">Choose a Gametag and press join to wait for another player</p>
+          <p id="welcomeParagraph">Choose a gametag and press join to wait for a second player. When the game starts, kill the zombie as quick as possible. You have ten rounds to beat your opponent.</p>
       </div>
       <form id="user-form">
           <input id="nametag" type="text" placeholder="Choose Gametag"> </input>
@@ -41,7 +41,7 @@
 
     <div class="col-4 waiting hide">
       <h3 class="text-center">Waiting for a second player</h3>
-      <h4 class="text-center mb-4">Be ready!</h4>
+      <h4 class="text-center mb-4">Be ready ... </h4>
         <div class="row d-flex justify-content-center">
           <div class="col-1 p-0">
             <div class="spinner-grow text-success " role="status">
@@ -52,8 +52,7 @@
     </div>
 </div>
   
-    <div id="game" class="container w-75 border hide">
-        <h3>Chase da virus 🦠</h3>
+    <div id="game" class="container w-75 hide border">
         <div class="row rowgame">
           <div class="col" id="div1"></div>
           <div class="col" id="div2"></div>
@@ -90,13 +89,13 @@
           <div class="col" id="div25"></div>
 				</div>
 
-        <div class="container">
+        <div class="container mt-5">
           <div class="row justify-content-center">
             <div class="col-sm-4">
               
               <div class="player">
                 <h4 class="playerOne">Player 1</h4>
-                <p>Here goes time</p>
+                <p>00:00:00</p>
              </div>
             
             </div>
@@ -104,7 +103,7 @@
             <div class="col-sm-4">
               <div class="player">
                 <h4 class="playerTwo">Player 2</h4>
-                <p>Here goes time</p>
+                <p>00:00:00</p>
             </div>
           </div>
         </div>
