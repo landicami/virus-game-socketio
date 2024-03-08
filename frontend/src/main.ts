@@ -24,6 +24,7 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
 let username: string | null = null;
 let startTime: number;
 let virusPressed: number;
+let currentRound = 0;
 
 startDiv.classList.remove("hide");
 gameDiv.classList.add("hide");
@@ -99,6 +100,14 @@ userSubmit.addEventListener("submit", (e) => {
     gameDiv.classList.remove("hide");
     highscoreDiv.classList.add("hide");
 
+    currentRound = gameroom.currentRound as number; 
+    if (gameroom.currentRound !== undefined) {
+      currentRound = gameroom.currentRound; 
+    } else {
+      currentRound = 0; 
+    }
+    document.getElementById('round-display')!.innerText = `Round: ${currentRound}`;
+
     const playerOneParagraph = document.querySelector(".playerOne") as HTMLParagraphElement;
     const playerTwoParagraph = document.querySelector(".playerTwo") as HTMLParagraphElement;
 
@@ -125,6 +134,13 @@ userSubmit.addEventListener("submit", (e) => {
             virusPressed = virusClicked();
             // virusClicked();
             socket.emit("virusClick", (virusPressed));
+            // round logic
+            currentRound++; 
+            document.getElementById('round-display')!.innerText = `Round: ${currentRound}`; 
+
+            if (currentRound >= 10) {
+            console.log("Game Over! All 10 rounds complete.");
+           }
           });
         }, virusInterval);
       } else {

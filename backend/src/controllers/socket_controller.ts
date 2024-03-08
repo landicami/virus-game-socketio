@@ -82,6 +82,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	socket.on("virusClick", (virusPressed: number) => {
 		debug("Time it took to click", virusPressed.toFixed(1));
 	});
+
 };
 
 

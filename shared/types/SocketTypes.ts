@@ -24,4 +24,5 @@ export interface RoomInfo {
 export interface GameRoomInterface {
     id: string;
     users: string[];
+    currentRound?: number;
 }
