@@ -101,7 +101,7 @@ export const handleConnection = (
                 id: userId
             },
             data: {
-                rounds: virusPressed
+                virusClicked: virusPressed
             }
         });
         debug("The user has pressed", userthatPressed);
@@ -125,13 +125,13 @@ export const handleConnection = (
             const user2 = usersInRoom[1];
             debug("This is user2", user2)
 
-            if (user1.rounds && user2.rounds) {
+            if (user1.virusClicked && user2.virusClicked) {
                 // Jämför rounds och tilldela poäng
-                if (user1.rounds < user2.rounds) {
-					socket.to(gameroom.id).emit("roundWinner", user1.username )
+                if (user1.virusClicked < user2.virusClicked) {
+					io.to(gameroom.id).emit("roundWinner", user1.username )
                   debug(`User 1 ${user1.username} får ett poäng.`);
-                } else if (user1.rounds > user2.rounds) {
-					socket.to(gameroom.id).emit("roundWinner", user2.username )
+                } else if (user1.virusClicked > user2.virusClicked) {
+					io.to(gameroom.id).emit("roundWinner", user2.username )
                   debug(` User 2 ${user2.username} får ett poäng.`);
                 } else {
                   debug('Ingen vinner, rounds är lika.');

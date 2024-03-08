@@ -26,7 +26,7 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
 let username: string | null = null;
 let startTime: number;
 let virusPressed: number;
-let count = 0;
+let roundCount = 0;
 
 startDiv.classList.remove("hide");
 gameDiv.classList.add("hide");
@@ -137,13 +137,13 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
 
             socket.on("roundWinner",(username)=>{
               if(username === playerOne){
-                count++;
+                roundCount++;
             console.log("username1", username);
-            playerOneResult.innerText = `${count}`;
+            playerOneResult.innerText = `${roundCount}`;
               } else if (username === playerTwo){
-                count++;
+                roundCount++;
                 console.log("username2:", username);
-                playerTwoResult.innerText = `${count}`;
+                playerTwoResult.innerText = `${roundCount}`;
               }
               });
             
