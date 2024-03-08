@@ -16,7 +16,7 @@ export interface ClientToServerEvents {
   //  userJoinReq: (username: string, callback: (success: boolean, randomNumber: number, randomInterval: number) => void) => void;
 
   userJoinReq: (username: string, callback: (success: boolean) => void) => void;
-  virusClick: (virusClicked: number) => void;
+  virusClick: (data: { virusClicked: number; userId: string }) => void;
 }
 
 export interface RoomInfo {

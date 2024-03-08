@@ -36,7 +36,7 @@ const startTimer = () => {
   return startTime;
   // return (startTime = Date.now());
 };
-const virusClicked = () => {
+const virusClicked = (userId: string) => {
   const endTime = Date.now();
   const timeTaken = endTime - startTime;
   console.log("timeTaken is: ", timeTaken);
@@ -110,6 +110,8 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
     playerTwoParagraph.innerText = playerTwo;
     console.log(players, playerOne, playerTwo);
 
+    // const userId = socket.id;
+
     function getDivandPutvirus(virusShow: number, virusInterval: number) {
       const divID = "div" + virusShow;
       const divElement = document.getElementById(divID) as HTMLDivElement;
@@ -119,10 +121,25 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
           divElement.innerHTML = `<span class="knife" id="virusEmoji">&#129503;</span>`;
           console.log(divElement);
           startTimer();
-          divElement.addEventListener("click", () => {
-            virusPressed = virusClicked();
+          divElement.addEventListener("click", (e) => {
+            e.preventDefault();
+            const userId = socket.id;
+            if (!userId) {
+              return;
+            }
+            virusPressed = virusClicked(userId);
             // virusClicked();
-            socket.emit("virusClick", virusPressed);
+            // if (!socket.id) {
+            //   return;
+            // }
+            // if (!virusPressed) {
+            //   return;
+            // }
+            if (!userId) {
+              return;
+            }
+            socket.emit("virusClick", { virusClicked: virusPressed, userId });
+            startTimer();
           });
         }, virusInterval);
       } else {

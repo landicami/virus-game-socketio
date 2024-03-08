@@ -91,11 +91,37 @@ export const handleConnection = (
 			debug("the newroomid", newRoom.id);
 		}
 	});
-	socket.on("virusClick", async (virusPressed: number) => {
-		debug("Time it took to click", virusPressed.toFixed(1));
-	});
-};
 
+	type player = {
+		userId: string;
+		time: number;
+	};
+
+	let players: { [userId: string]: player } = {};
+
+	let arrayTest = [];
+	socket.on("virusClick", async (data) => {
+		debug("This is the person who pressed the zombie: ", data.userId);
+		debug("Time it took to click", data.virusClicked.toFixed(1));
+		await prisma.user.update({
+			where: {
+				id: data.userId,
+			},
+			data: {
+				rounds: data.virusClicked,
+			},
+		});
+
+		const rounds = await prisma.user.findMany({
+			where: {
+				rounds: data.virusClicked,
+			},
+		});
+		arrayTest.push(rounds);
+		debug("rounds", arrayTest.length);
+	});
+	debug(arrayTest.length);
+};
 // Skapa en global array för att hålla reda på aktiva rum
 
 // socket.on("userJoinReq", async (username, callback) => {
