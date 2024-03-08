@@ -15,6 +15,8 @@ const startDiv = document.querySelector("#start") as HTMLDivElement;
 const gameDiv = document.querySelector("#game") as HTMLDivElement;
 const waitingDiv = document.querySelector(".waiting") as HTMLDivElement;
 const highscoreDiv = document.querySelector(".highscoreDiv") as HTMLDivElement;
+const playerOneResult = document.querySelector("#playerOneResult") as HTMLParagraphElement;
+const playerTwoResult = document.querySelector("#playerTwoResult") as HTMLParagraphElement;
 
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
@@ -24,6 +26,7 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
 let username: string | null = null;
 let startTime: number;
 let virusPressed: number;
+let count = 0;
 
 startDiv.classList.remove("hide");
 gameDiv.classList.add("hide");
@@ -36,7 +39,7 @@ const startTimer = () => {
   return startTime;
   // return (startTime = Date.now());
 };
-const virusClicked = (userId: string) => {
+const virusClicked = () => {
   const endTime = Date.now();
   const timeTaken = endTime - startTime;
   console.log("timeTaken is: ", timeTaken);
@@ -121,24 +124,29 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
           divElement.innerHTML = `<span class="knife" id="virusEmoji">&#129503;</span>`;
           console.log(divElement);
           startTimer();
-          divElement.addEventListener("click", (e) => {
-            e.preventDefault();
-            const userId = socket.id;
-            if (!userId) {
+          startStoptimer();
+          divElement.addEventListener("click", () => {
+            startStoptimer();
+            divElement.classList.add("hide");
+            virusPressed = virusClicked();
+            let userId = socket.id;
+            if(!userId){
               return;
             }
-            virusPressed = virusClicked(userId);
-            // virusClicked();
-            // if (!socket.id) {
-            //   return;
-            // }
-            // if (!virusPressed) {
-            //   return;
-            // }
-            if (!userId) {
-              return;
-            }
-            socket.emit("virusClick", { virusClicked: virusPressed, userId });
+            socket.emit("virusClick", virusPressed, gameroom, userId);
+
+            socket.on("roundWinner",(username)=>{
+              if(username === playerOne){
+                count++;
+            console.log("username1", username);
+            playerOneResult.innerText = `${count}`;
+              } else if (username === playerTwo){
+                count++;
+                console.log("username2:", username);
+                playerTwoResult.innerText = `${count}`;
+              }
+              });
+            
             startTimer();
           });
         }, virusInterval);
@@ -150,4 +158,50 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
   } else {
     waitingDiv.classList.remove("hide");
   }
+
+
 });
+
+//stopwatch
+
+let timer = 0;
+let isRunning = false;
+let milliseconds = 0;
+let seconds = 0;
+
+const display = document.querySelector("#display") as HTMLHeadingElement;
+
+function startStoptimer() {
+  if (!isRunning) {
+    timer = setInterval(runStopwatch, 10);
+    isRunning = true;
+  } else {
+    clearInterval(timer);
+    isRunning = false;
+  }
+}
+
+function runStopwatch() {
+  milliseconds++;
+  if (milliseconds === 100) {
+    milliseconds = 0;
+    seconds++;
+  }
+  display.innerHTML =
+    (seconds < 10 ? "0" + seconds : seconds) +
+    "." +
+    (milliseconds < 10
+      ? "00" + milliseconds
+      : milliseconds < 100
+      ? "0" + milliseconds
+      : milliseconds);
+}
+
+function resetTimer() {
+  clearInterval(timer);
+  isRunning = false;
+  milliseconds = 0;
+  seconds = 0;
+  display.innerHTML = "00:00:00";
+}
+console.log(resetTimer()); //använd senare

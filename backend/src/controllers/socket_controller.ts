@@ -92,36 +92,60 @@ export const handleConnection = (
 		}
 	});
 
-	type player = {
-		userId: string;
-		time: number;
-	};
+	socket.on("virusClick", async(virusPressed: number, gameroom: GameRoomInterface, userId:string) => {
+		debug("Time it took to click", virusPressed.toFixed(1));
+        debug("This is the person who clicked", userId);
 
-	let players: { [userId: string]: player } = {};
+        const userthatPressed = await prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                rounds: virusPressed
+            }
+        });
+        debug("The user has pressed", userthatPressed);
+		const findRoomtocompare = await prisma.gameroom.findUnique({
+            where: {
+                id: gameroom.id
+            },
+            include: {
+                users: true
+            },
+        });
+        debug("fint the room that the users are put in", findRoomtocompare);
+        if(!findRoomtocompare){
+            return;
+        }
+        const usersInRoom = findRoomtocompare?.users.map(user => user)
+        debug("This is arrayround", usersInRoom);
+        if(usersInRoom.length === 2){
+            const user1 = usersInRoom[0];
+            debug("This is user1", user1)
+            const user2 = usersInRoom[1];
+            debug("This is user2", user2)
 
-	let arrayTest = [];
-	socket.on("virusClick", async (data) => {
-		debug("This is the person who pressed the zombie: ", data.userId);
-		debug("Time it took to click", data.virusClicked.toFixed(1));
-		await prisma.user.update({
-			where: {
-				id: data.userId,
-			},
-			data: {
-				rounds: data.virusClicked,
-			},
-		});
+            if (user1.rounds && user2.rounds) {
+                // Jämför rounds och tilldela poäng
+                if (user1.rounds < user2.rounds) {
+					socket.to(gameroom.id).emit("roundWinner", user1.username )
+                  debug(`User 1 ${user1.username} får ett poäng.`);
+                } else if (user1.rounds > user2.rounds) {
+					socket.to(gameroom.id).emit("roundWinner", user2.username )
+                  debug(` User 2 ${user2.username} får ett poäng.`);
+                } else {
+                  debug('Ingen vinner, rounds är lika.');
+                }
+              } else {
+                debug('En eller båda användarna är null.');
+              }
+            } else {
+              debug('Felaktig data, förväntar mig exakt två användare.');
+            }
 
-		const rounds = await prisma.user.findMany({
-			where: {
-				rounds: data.virusClicked,
-			},
-		});
-		arrayTest.push(rounds);
-		debug("rounds", arrayTest.length);
-	});
-	debug(arrayTest.length);
-};
+
+        })
+}
 // Skapa en global array för att hålla reda på aktiva rum
 
 // socket.on("userJoinReq", async (username, callback) => {
