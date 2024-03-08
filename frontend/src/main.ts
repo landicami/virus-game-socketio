@@ -139,8 +139,11 @@ userSubmit.addEventListener("submit", (e) => {
             document.getElementById('round-display')!.innerText = `Round: ${currentRound}`; 
 
             if (currentRound >= 10) {
-            console.log("Game Over! All 10 rounds complete.");
-           }
+              console.log("Game Over! All 10 rounds complete.");
+              socket.emit("gameOver", gameroom); 
+            } else {
+              socket.emit("nextRound");  
+            }
           });
         }, virusInterval);
       } else {
@@ -153,6 +156,14 @@ userSubmit.addEventListener("submit", (e) => {
   }
     
   });
+  socket.on("nextRound", () => {
+    resetTimer();
+  })
+  socket.on("gameOver", (gameroom) => {
+    highscoreDiv.classList.remove("hide");
+    gameDiv.classList.add("hide");
+    console.log("Game Over! Results:", gameroom);
+  })
 
 //stopwatch
 

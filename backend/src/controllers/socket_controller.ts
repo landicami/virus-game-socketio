@@ -46,6 +46,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		if (existingRoom.users.length === 2) {
 			socket.join(existingRoom.id);
 
+			existingRoom.currentRound = existingRoom.currentRound ? existingRoom.currentRound + 1 : 1;
 			io.to(existingRoom.id).emit("gameStart", existingRoom, randomNumber(), randomInterval);
 			callback(true);
 
@@ -81,6 +82,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	});
 	socket.on("virusClick", (virusPressed: number) => {
 		debug("Time it took to click", virusPressed.toFixed(1));
+	});
+	socket.on("nextRound", () => {
+		const room = activeGameRooms.find(room => room.users.includes(socket.id));
+		if (room) {
+			io.to(room.id).emit("gameStart", room, randomNumber(), randomInterval);
+		}
 	});
 
 };
