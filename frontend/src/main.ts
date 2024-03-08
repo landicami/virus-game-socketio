@@ -121,6 +121,7 @@ userSubmit.addEventListener("submit", (e) => {
           startStoptimer();
           divElement.addEventListener("click", () => {
             startStoptimer();
+            divElement.classList.add("hide");
             virusPressed = virusClicked();
             // virusClicked();
             socket.emit("virusClick", (virusPressed));
@@ -139,7 +140,7 @@ userSubmit.addEventListener("submit", (e) => {
 
 //stopwatch
 
-let timer: number = 0;
+let timer = 0;
 let isRunning = false;
 let milliseconds = 0;
 let seconds = 0;
@@ -173,5 +174,5 @@ function resetTimer() {
   milliseconds = 0;
   seconds = 0;
   display.innerHTML = '00:00:00';
-}
+} console.log(resetTimer()); //använd senare
 
