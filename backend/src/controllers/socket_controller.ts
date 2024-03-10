@@ -83,12 +83,23 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	socket.on("virusClick", (virusPressed: number) => {
 		debug("Time it took to click", virusPressed.toFixed(1));
 	});
-	socket.on("nextRound", () => {
-		const room = activeGameRooms.find(room => room.users.includes(socket.id));
+	socket.on("nextRound", (roomId) => {
+		console.log(roomId);
+		console.log("Received 'nextRound' event from client!"); // (This is already working)
+		const room = activeGameRooms.find(room => room.id === roomId);
+		console.log(activeGameRooms, roomId);
+		console.log("Found room:", room); // Check if a room is actually found
 		if (room) {
+			console.log("About to emit 'gameStart'"); // Check if it enters this block
 			io.to(room.id).emit("gameStart", room, randomNumber(), randomInterval);
+			console.log("Emitted 'gameStart'"); // Check if the emission happens
+		} else {
+			console.log("Could not find room for the user!");
 		}
 	});
+	socket.on("gameOver" as any, (gameroom: GameRoomInterface) => {
+		console.log("Game Over! Fack you loooose!", gameroom)
+	})
 
 };
 

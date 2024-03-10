@@ -5,7 +5,7 @@ export {};
 // Events emitted by the server to the client
 export interface ServerToClientEvents {
     gameStart: (gameroom: GameRoomInterface, virusShow: number, virusInterval: number) => void;
-    nextRound: () => void;
+    nextRound: (roomId: string, round: number) => void;
     gameOver: (gameroom: GameRoomInterface) => void;
 }
 
@@ -15,7 +15,7 @@ export interface ClientToServerEvents {
 
   userJoinReq: (username: string, callback: (success: boolean) => void) => void;
   virusClick: (virusClicked: number) => void;
-  nextRound: () => void;
+  nextRound: (roomId: string, round: number) => void;
 }
 
 export interface RoomInfo {

@@ -26,6 +26,7 @@ let startTime: number;
 let virusPressed: number;
 let currentRound = 0;
 
+
 startDiv.classList.remove("hide");
 gameDiv.classList.add("hide");
 highscoreDiv.classList.remove("hide");
@@ -111,6 +112,8 @@ userSubmit.addEventListener("submit", (e) => {
     const playerOneParagraph = document.querySelector(".playerOne") as HTMLParagraphElement;
     const playerTwoParagraph = document.querySelector(".playerTwo") as HTMLParagraphElement;
 
+    
+    let currentRoomId = gameroom.id;
     const players = gameroom.users;
     const playerOne = gameroom.users[0];
     const playerTwo = gameroom.users[1];
@@ -135,14 +138,20 @@ userSubmit.addEventListener("submit", (e) => {
             // virusClicked();
             socket.emit("virusClick", (virusPressed));
             // round logic
+            console.log(currentRound);
             currentRound++; 
+            console.log(currentRound);
             document.getElementById('round-display')!.innerText = `Round: ${currentRound}`; 
 
             if (currentRound >= 10) {
               console.log("Game Over! All 10 rounds complete.");
-              socket.emit("gameOver", gameroom); 
+              socket.emit("gameOver" as any, currentRoomId); 
             } else {
-              socket.emit("nextRound");  
+              console.log("Emitting 'nextRound' with socket ID:", socket.id)
+              console.log(currentRoomId);
+              socket.emit("nextRound", currentRoomId);
+              console.log(currentRoomId);
+              console.log("Sent 'nextRound' event");  
             }
           });
         }, virusInterval);
