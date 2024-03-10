@@ -10,6 +10,46 @@ import { createUserInput } from "@shared/types/Models";
 // Create a new debug instance
 const debug = Debug("backend:socket_controller");
 
+interface Round {
+	[key: string]: number;
+}
+
+interface RoomsInterface {
+	[key: string]: {
+		rounds: Round[];
+	};
+}
+// rooms {
+	// 	"12345": {
+	// rounds: [
+		// { "player1": 2.5, "player2": 3.5 },
+		// { "player1": 2.5, "player2": 3.5 },
+		// { "player1": 2.5 },
+	// ]
+// 	}
+// }
+
+const rooms: RoomsInterface = {};
+
+const a = ['a', 'b', 'c'];
+a.length; // 3
+
+function getRound(rounds: Round[]): number | null {
+	if (rounds.length === 0) {
+		// Inga rundor har registrerats
+		return null;
+	}
+
+	const lastRoundNumber = rounds.length -1; // 2
+
+	// Object keys = ["player1"]
+	if (Object.keys(rounds[lastRoundNumber]).length === 2) {
+		// Två spelare har registrerat score
+		return null;
+	}
+	// Returnera index för senaste rundan
+	return lastRoundNumber;
+}
 
 let activeGameRooms: GameRoomInterface[] = [];
 function randomNumber() {
@@ -48,7 +88,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			existingRoom.currentRound = existingRoom.currentRound ? existingRoom.currentRound + 1 : 1;
 			io.to(existingRoom.id).emit("gameStart", existingRoom, randomNumber(), randomInterval);
-			callback(true);
+
 
 			 // Lägg till anslutningen till rummet
 		}
@@ -75,31 +115,76 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			id: newRoom.id,
 			users: [username]
 		});
+
 		socket.join(newRoom.id);
-		debug("the newroomid", newRoom.id)
+		// Skapa ett rum när f;rsta användaren joinar
+		if (rooms[newRoom.id] === undefined) {
+			rooms[newRoom.id] = {
+				rounds: [],
+			};
+		}
+
+		debug("the newroomid", newRoom.id);
 	}
+	callback(username);
 
 	});
-	socket.on("virusClick", (virusPressed: number) => {
+	socket.on("virusClick", (roomId: string, username: string, virusPressed: number) => {
 		debug("Time it took to click", virusPressed.toFixed(1));
-	});
-	socket.on("nextRound", (roomId) => {
-		console.log(roomId);
-		console.log("Received 'nextRound' event from client!"); // (This is already working)
-		const room = activeGameRooms.find(room => room.id === roomId);
-		console.log(activeGameRooms, roomId);
-		console.log("Found room:", room); // Check if a room is actually found
-		if (room) {
-			console.log("About to emit 'gameStart'"); // Check if it enters this block
-			io.to(room.id).emit("gameStart", room, randomNumber(), randomInterval);
-			console.log("Emitted 'gameStart'"); // Check if the emission happens
+
+		// Hitta vilken runda det vi ska registrera score för
+		const availableRoundIndex = getRound(rooms[roomId].rounds);
+
+		if (availableRoundIndex === null) {
+			// Skapa en ny runda och lägg till score för user
+			rooms[roomId].rounds.push({
+				[username]: virusPressed,
+			})
+			// rounds:[
+			// ...
+			// { player1: 2.5 }
+			//]
 		} else {
-			console.log("Could not find room for the user!");
+			// Varför funkar detta?
+			rooms[roomId].rounds[availableRoundIndex][username] = virusPressed;
+			// rooms['rum1233542345234234234'].rounds[3]['player99] = 55;
+			// rounds:[
+			// ...
+			// { player1: 2.5, player99: 55},
+			//]
+			// Lägg till score för användaren i den aktuella rundan
+
+			// Om båda spelarna har klickat, skicka nästa runda
+			if (availableRoundIndex !== 10) {
+				io.to(roomId).emit("nextRound", roomId, availableRoundIndex + 1);
+			} else {
+				// Avsluta spel
+				// Event till alla i rummet
+				// Spara i DB
+				// delete rooms[roomId];
+			}
+
+			debug("Room status:", JSON.stringify(rooms[roomId]));
 		}
+
 	});
-	socket.on("gameOver" as any, (gameroom: GameRoomInterface) => {
-		console.log("Game Over! Fack you loooose!", gameroom)
-	})
+	// socket.on("nextRound", (roomId, round) => {
+	// 	console.log(roomId);
+	// 	console.log("Received 'nextRound' event from client!"); // (This is already working)
+	// 	const room = activeGameRooms.find(room => room.id === roomId);
+	// 	console.log(activeGameRooms, roomId);
+	// 	console.log("Found room:", room); // Check if a room is actually found
+	// 	if (room) {
+	// 		console.log("About to emit 'gameStart'"); // Check if it enters this block
+	// 		io.to(room.id).emit("gameStart", room, randomNumber(), randomInterval);
+	// 		console.log("Emitted 'gameStart'"); // Check if the emission happens
+	// 	} else {
+	// 		console.log("Could not find room for the user!");
+	// 	}
+	// });
+	// socket.on("gameOver" as any, (gameroom: GameRoomInterface) => {
+	// 	console.log("Game Over! Fack you loooose!", gameroom)
+	// })
 
 };
 

@@ -13,9 +13,10 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
 //  userJoinReq: (username: string, callback: (success: boolean, randomNumber: number, randomInterval: number) => void) => void;
 
-  userJoinReq: (username: string, callback: (success: boolean) => void) => void;
-  virusClick: (virusClicked: number) => void;
-  nextRound: (roomId: string, round: number) => void;
+  userJoinReq: (username: string, callback: (username: string) => void) => void;
+  virusClick: (roomId: string, username: string, virusClicked: number) => void;
+  // Ska klienten verkligen skicka när rundan är över? Bör göras av servern
+  // nextRound: (roomId: string, round: number) => void;
 }
 
 export interface RoomInfo {
