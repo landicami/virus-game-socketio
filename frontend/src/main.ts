@@ -16,7 +16,6 @@ const gameDiv = document.querySelector("#game") as HTMLDivElement;
 const waitingDiv = document.querySelector(".waiting") as HTMLDivElement;
 const highscoreDiv = document.querySelector(".highscoreDiv") as HTMLDivElement;
 
-
 const playerOneParagraph = document.querySelector(".playerOne") as HTMLParagraphElement;
 const playerTwoParagraph = document.querySelector(".playerTwo") as HTMLParagraphElement;
 
@@ -57,8 +56,6 @@ const virusClicked = () => {
   return timeTaken;
 };
 
-
-
 // Listen for when connection is established
 socket.on("connect", () => {
   console.log("💥 Connected to the server", SOCKET_HOST);
@@ -88,7 +85,6 @@ userSubmit.addEventListener("submit", (e) => {
     startDiv.classList.add("hide");
     gameDiv.classList.add("hide");
     waitingDiv.classList.remove("hide");
-
   }
 
   socket.emit("userJoinReq", trimmedUsername, (callback) => {
@@ -194,7 +190,7 @@ let isRunning = false;
 let milliseconds = 0;
 let seconds = 0;
 
-const display = document.querySelector('#display') as HTMLHeadingElement;
+const display = document.querySelector("#display") as HTMLHeadingElement;
 
 function startstopWatch() {
   if (!isRunning) {

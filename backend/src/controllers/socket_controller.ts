@@ -3,9 +3,14 @@
  */
 import Debug from "debug";
 import { Server, Socket } from "socket.io";
-import { ClientToServerEvents, GameRoomInterface, ServerToClientEvents } from "@shared/types/SocketTypes";
+import {
+	ClientToServerEvents,
+	GameRoomInterface,
+	ServerToClientEvents,
+} from "@shared/types/SocketTypes";
 import prisma from "../prisma";
 import { createUserInput } from "@shared/types/Models";
+import { userInfo } from "os";
 
 // Create a new debug instance
 const debug = Debug("backend:socket_controller");
@@ -63,14 +68,18 @@ const randomInterval = Math.floor(Math.random() * (8500 - 1500 + 1)) + 1500; // 
 debug(randomNumber(), randomInterval);
 
 // Handle a user connecting
-export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>,
-	io: Server<ClientToServerEvents, ServerToClientEvents>) => {
+export const handleConnection = (
+	socket: Socket<ClientToServerEvents, ServerToClientEvents>,
+	io: Server<ClientToServerEvents, ServerToClientEvents>
+) => {
 	debug("🙋 A user connected", socket.id);
 	socket.on("userJoinReq", async (username, callback) => {
 		debug("Användare vill ansluta", username);
 
 		// Hitta ett befintligt rum med färre än 2 användare
-		let existingRoom = activeGameRooms.find(room => room.users.length < 2);
+		let existingRoom = activeGameRooms.find(
+			(room) => room.users.length < 2
+		);
 
 		if (existingRoom) {
 			// Om ett rum med färre än 2 användare finns, lägg till användaren till detta rum
@@ -282,9 +291,5 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			debug("Room status:", JSON.stringify(rooms[roomId]));
 		}
-
 	});
-
-
 };
-
