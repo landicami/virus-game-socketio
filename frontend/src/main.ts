@@ -85,7 +85,7 @@ userSubmit.addEventListener("submit", (e) => {
     return;
   }
 
-  if(trimmedUsername) {
+  if (trimmedUsername) {
     startDiv.classList.add("hide");
     gameDiv.classList.add("hide");
     waitingDiv.classList.remove("hide");
@@ -93,98 +93,98 @@ userSubmit.addEventListener("submit", (e) => {
   }
 
   socket.emit("userJoinReq", trimmedUsername, (callback) => {
-      if (!callback) {
-        alert("GET THE HELL OUT OF MY FACE");
-        return;
-      }
-      console.log("User has joined through back and front", callback);
-      username = callback;
+    if (!callback) {
+      alert("GET THE HELL OUT OF MY FACE");
+      return;
     }
+    console.log("User has joined through back and front", callback);
+    username = callback;
+  }
   );
 });
 
-  socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
-    console.log("Now the game will start, with the", gameroom);
-    console.log(`Virus will appear in div${virusShow} within ${virusInterval} seconds`);
-    setupGameView(gameroom.users);
-    // if(gameroom.users.length === 2){
-    // startDiv.classList.add("hide");
-    // waitingDiv.classList.add("hide");
-    // gameDiv.classList.remove("hide");
-    // highscoreDiv.classList.add("hide");
+socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
+  console.log("Now the game will start, with the", gameroom);
+  console.log(`Virus will appear in div${virusShow} within ${virusInterval} seconds`);
+  setupGameView(gameroom.users);
+  // if(gameroom.users.length === 2){
+  // startDiv.classList.add("hide");
+  // waitingDiv.classList.add("hide");
+  // gameDiv.classList.remove("hide");
+  // highscoreDiv.classList.add("hide");
 
-    currentRound = gameroom.currentRound as number; 
-    // if (gameroom.currentRound !== undefined) {
-    //   currentRound = gameroom.currentRound; 
-    // } else {
-    //   currentRound = 0; 
-    // }
-    // document.getElementById('round-display')!.innerText = `Round: ${currentRound}`;
-    
-    currentRoomId = gameroom.id;
-    // const players = gameroom.users;
-    getDivandPutvirus(virusShow, virusInterval);
+  currentRound = gameroom.currentRound as number;
+  // if (gameroom.currentRound !== undefined) {
+  //   currentRound = gameroom.currentRound; 
+  // } else {
+  //   currentRound = 0; 
+  // }
+  // document.getElementById('round-display')!.innerText = `Round: ${currentRound}`;
+
+  currentRoomId = gameroom.id;
+  // const players = gameroom.users;
+  getDivandPutvirus(virusShow, virusInterval);
   // } else {
   //   waitingDiv.classList.remove("hide");
   // }
-    
-  });
 
-  socket.on("roundWinner", (usersInRoom) => {
-    const userswithResult = usersInRoom;
-    console.log(userswithResult);
+});
 
-    //Sätt ut rundans vinnare i DOM
-    if (usersInRoom.username === playerOneParagraph.innerText) {
-      playerOneRoundCount++;
-      console.log("username1", username);
-      playerOneResult.innerText = `${playerOneRoundCount}`;
-          
+socket.on("roundWinner", (usersInRoom) => {
+  const userswithResult = usersInRoom;
+  console.log(userswithResult);
 
-    } else {
-      playerTwoRoundCount++;
-      console.log("username2:", username);
-      playerTwoResult.innerText = `${playerTwoRoundCount}`;
-      
-
-    }
-
-  });
-
-  socket.on("latestReactiontime", (usersInRoom) => {
-      if(usersInRoom[0].virusClicked){
-
-      let virusClickedInSeconds1: string = (usersInRoom[0].virusClicked / 1000).toFixed(3);
-      playerOneLatestTime.textContent = virusClickedInSeconds1;
-      console.log("Playerone latest time", virusClickedInSeconds1)
-      }
-
-      if(usersInRoom[1].virusClicked){
-        let virusClickedInSeconds2: string = (usersInRoom[1].virusClicked / 1000).toFixed(3);
-        playerTwoLatestTime.textContent = virusClickedInSeconds2;
-        console.log("Playertwo latest time", virusClickedInSeconds2)
-
-        }
+  //Sätt ut rundans vinnare i DOM
+  if (usersInRoom.username === playerOneParagraph.innerText) {
+    playerOneRoundCount++;
+    console.log("username1", username);
+    playerOneResult.innerText = `${playerOneRoundCount}`;
 
 
-    setTimeout(() => {
-      resetTimer();
-      // playerOneLatestTime.textContent = "00:00:00"
-      // playerTwoLatestTime.textContent = "00:00:00"
+  } else {
+    playerTwoRoundCount++;
+    console.log("username2:", username);
+    playerTwoResult.innerText = `${playerTwoRoundCount}`;
 
-    }, 3000);
-  });
 
-  socket.on("nextRound", (roomId, RoundIndex, virusShow, virusInterval) => {
-    console.log(roomId, RoundIndex);
-    getDivandPutvirus(virusShow, virusInterval);
-    // resetTimer();
-  })
-  socket.on("gameOver", (gameroom) => {
-    highscoreDiv.classList.remove("hide");
-    gameDiv.classList.add("hide");
-    console.log("Game Over! Results:", gameroom);
-  })
+  }
+
+});
+
+socket.on("latestReactiontime", (usersInRoom) => {
+  if (usersInRoom[0].virusClicked) {
+
+    let virusClickedInSeconds1: string = (usersInRoom[0].virusClicked / 1000).toFixed(3);
+    playerOneLatestTime.textContent = virusClickedInSeconds1;
+    console.log("Playerone latest time", virusClickedInSeconds1)
+  }
+
+  if (usersInRoom[1].virusClicked) {
+    let virusClickedInSeconds2: string = (usersInRoom[1].virusClicked / 1000).toFixed(3);
+    playerTwoLatestTime.textContent = virusClickedInSeconds2;
+    console.log("Playertwo latest time", virusClickedInSeconds2)
+
+  }
+
+
+  setTimeout(() => {
+    resetTimer();
+    // playerOneLatestTime.textContent = "00:00:00"
+    // playerTwoLatestTime.textContent = "00:00:00"
+
+  }, 3000);
+});
+
+socket.on("nextRound", (roomId, RoundIndex, virusShow, virusInterval) => {
+  console.log(roomId, RoundIndex);
+  getDivandPutvirus(virusShow, virusInterval);
+  // resetTimer();
+})
+socket.on("gameOver", (gameroom) => {
+  highscoreDiv.classList.remove("hide");
+  gameDiv.classList.add("hide");
+  console.log("Game Over! Results:", gameroom);
+})
 
 //stopwatch
 
@@ -196,24 +196,28 @@ let seconds = 0;
 const display = document.querySelector('#display') as HTMLHeadingElement;
 
 function startStoptimer() {
-    if (!isRunning) {
-        timer = setInterval(runStopwatch, 10);
-        isRunning = true;
-    } else {
-        clearInterval(timer);
-        isRunning = false;
-    }
+  if (!isRunning) {
+    timer = setInterval(runStopwatch, 10);
+    isRunning = true;
+  } else {
+    clearInterval(timer);
+    isRunning = false;
+  }
 }
 
 function runStopwatch() {
-  milliseconds++;
-  if (milliseconds === 100) {
-      milliseconds = 0;
-      seconds++;
-  }
-  display.innerHTML = 
-      (seconds < 10 ? '0' + seconds : seconds) + '.' + 
-      (milliseconds < 10 ? '00' + milliseconds : milliseconds < 100 ? '0' + milliseconds : milliseconds);
+  // milliseconds++;
+  // if (milliseconds === 100) {
+  //     milliseconds = 0;
+  //     seconds++;
+  // }
+  const elapsedTime = Date.now() - startTime;  // 2337 ms
+  const seconds = Math.floor(elapsedTime / 1000);  // 2
+  const milliseconds = elapsedTime - (seconds * 1000);   // 2337 - 2000 = 337
+
+  display.innerHTML =
+    (seconds < 10 ? '0' + seconds : seconds) + '.' +
+    (milliseconds < 10 ? '00' + milliseconds : milliseconds < 100 ? '0' + milliseconds : milliseconds);
 }
 
 function resetTimer() {
@@ -222,18 +226,18 @@ function resetTimer() {
   milliseconds = 0;
   seconds = 0;
   display.innerHTML = '00:00:00';
-} 
+}
 // console.log(resetTimer()); //använd senare
 
-function setupGameView(users: string[]){
-    startDiv.classList.add("hide");
-    waitingDiv.classList.add("hide");
-    gameDiv.classList.remove("hide");
-    highscoreDiv.classList.add("hide");
-    const playerOne = users[0];
-    const playerTwo = users[1];
-    playerOneParagraph.innerText = playerOne;
-    playerTwoParagraph.innerText = playerTwo;
+function setupGameView(users: string[]) {
+  startDiv.classList.add("hide");
+  waitingDiv.classList.add("hide");
+  gameDiv.classList.remove("hide");
+  highscoreDiv.classList.add("hide");
+  const playerOne = users[0];
+  const playerTwo = users[1];
+  playerOneParagraph.innerText = playerOne;
+  playerTwoParagraph.innerText = playerTwo;
 }
 
 function getDivandPutvirus(virusShow: number, virusInterval: number) {
