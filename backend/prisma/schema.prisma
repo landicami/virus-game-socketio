@@ -8,17 +8,18 @@ datasource db {
 }
 
 model Gameroom {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  users       User[]
-  playedgames PlayedGames[]
-  currentRound  Int     @default(1)
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  users        User[]
+  playedgames  PlayedGames[]
+  currentRound Int?
 }
 
 model User {
   id            String       @id @map("_id")
   username      String
   roomId        String?      @db.ObjectId
-  rounds        Int?
+  virusClicked  Int?
+  averageTime   Int[]
   room          Gameroom?    @relation(fields: [roomId], references: [id])
   playedgames   PlayedGames? @relation(fields: [playedgamesId], references: [id])
   playedgamesId String?      @db.ObjectId

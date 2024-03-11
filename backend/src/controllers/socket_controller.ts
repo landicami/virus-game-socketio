@@ -10,7 +10,8 @@ import { createUserInput } from "@shared/types/Models";
 // Create a new debug instance
 const debug = Debug("backend:socket_controller");
 
-let clickedarray = [];
+let clickedarray: number[] = [];
+let currentRoundinRoom = 0;
 
 interface Round {
 	[key: string]: number;
@@ -133,19 +134,16 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	});
 	socket.on("virusClick", async (userId: string, roomId: string, username: string, virusPressed: number) => {
 		debug("Time it took to click", virusPressed.toFixed(1));
-		clickedarray.push(virusPressed);
-		if (clickedarray.length === 10) {
-			//ta ut genomsnittstiden av tio och logga i usermodel som average time.
-		}
-
-
 
 		const userthatPressed = await prisma.user.update({
 			where: {
 				id: userId
 			},
 			data: {
-				virusClicked: virusPressed
+				virusClicked: virusPressed,
+				averageTime: {
+					push: virusPressed
+				}
 			}
 		});
 		debug("The user has pressed", userthatPressed);
@@ -171,7 +169,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			debug("This is user1", user1)
 			const user2 = usersInRoom[1];
 			debug("This is user2", user2)
-			io.to(roomId).emit("latestReactiontime", usersInRoom)
+			// io.to(roomId).emit("latestReactiontime", usersInRoom)
 
 			if (!user1.virusClicked || !user2.virusClicked) {
 				// båda har inte klickat ännu
@@ -191,10 +189,58 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			// 	debug('En eller båda användarna är null.');
 			// }
 		}
-		// io.to(roomId).emit("latestReactiontime", usersInRoom)
+		io.to(roomId).emit("latestReactiontime", usersInRoom)
+
+		currentRoundinRoom++;
+
+		const findRoomAndUpdateRounds = await prisma.gameroom.update({
+			where: {
+				id: roomId
+			},
+			data: {
+				currentRound: currentRoundinRoom
+			},
+		});
+		if (findRoomAndUpdateRounds.currentRound === 4) {
+			debug("VI vill inte fortsätta med någonting");
+			io.to(roomId).emit("gameOver", roomId);
+			//emitta gamestop
+
+		}
+
+		const roomwithUsers = await prisma.gameroom.findUnique({
+			where: {
+				id: roomId
+			},
+			include: {
+				users: true
+			},
+		});
+
+		if (!roomwithUsers) {
+			debug("Could not find room with id: ", roomId);
+			return;
+		}
+
+		for (let i = 0; i < roomwithUsers.users.length; i++) {
+			await prisma.user.update({
+				where: {
+					id: roomwithUsers.users[i].id,
+				},
+				data: {
+					virusClicked: null
+				},
+			});
+		}
+		io.to(roomId).emit("nextRound", roomId, randomNumber(), randomInterval);
+
+
+
+		// io.to(roomId).emit("nextRound", roomId, availableRoundIndex + 1, randomNumber(), randomInterval);
 
 		// Hitta vilken runda det vi ska registrera score för
 		const availableRoundIndex = getRound(rooms[roomId].rounds);
+		debug("du är på rad 198", availableRoundIndex);
 
 		if (availableRoundIndex === null) {
 			// Skapa en ny runda och lägg till score för user
@@ -205,6 +251,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			// ...
 			// { player1: 2.5 }
 			//]
+			debug("Går du inte här i ifsatsen på rad 208?", rooms[roomId].rounds)
 		} else {
 			// Varför funkar detta?
 			rooms[roomId].rounds[availableRoundIndex][username] = virusPressed;
@@ -216,35 +263,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 			// Lägg till score för användaren i den aktuella rundan
 
 			// Om båda spelarna har klickat, skicka nästa runda
-			if (availableRoundIndex <= 10) {
+			debug("Går du inte här i ifsatsen på rad 220?")
+
+			if (availableRoundIndex !== 10) {
+				debug("Går du inte här i ifsatsen på rad 223?")
+
 				//uppdatera användaren med tiden det tog att klicka
 				//nolla för båda spelarna i rummet
-				const roomwithUsers = await prisma.gameroom.findUnique({
-					where: {
-						id: roomId
-					},
-					include: {
-						users: true
-					},
-				});
 
-				if (!roomwithUsers) {
-					debug("Could not find room with id: ", roomId);
-					return;
-				}
-
-				for (let i = 0; i < roomwithUsers.users.length; i++) {
-					await prisma.user.update({
-						where: {
-							id: roomwithUsers.users[i].id,
-						},
-						data: {
-							virusClicked: null
-						},
-					});
-				}
-
-				io.to(roomId).emit("nextRound", roomId, availableRoundIndex + 1, randomNumber(), randomInterval);
 				debug(rooms[roomId].rounds);
 				debug("what round are we at?", availableRoundIndex);
 			} else {
@@ -258,134 +284,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 		}
 
 	});
-	// socket.on("nextRound", (roomId, round) => {
-	// 	console.log(roomId);
-	// 	console.log("Received 'nextRound' event from client!"); // (This is already working)
-	// 	const room = activeGameRooms.find(room => room.id === roomId);
-	// 	console.log(activeGameRooms, roomId);
-	// 	console.log("Found room:", room); // Check if a room is actually found
-	// 	if (room) {
-	// 		console.log("About to emit 'gameStart'"); // Check if it enters this block
-	// 		io.to(room.id).emit("gameStart", room, randomNumber(), randomInterval);
-	// 		console.log("Emitted 'gameStart'"); // Check if the emission happens
-	// 	} else {
-	// 		console.log("Could not find room for the user!");
-	// 	}
-	// });
-	// socket.on("gameOver" as any, (gameroom: GameRoomInterface) => {
-	// 	console.log("Game Over! Fack you loooose!", gameroom)
-	// })
+
 
 };
 
-
-
-// Skapa en global array för att hålla reda på aktiva rum
-
-	// socket.on("userJoinReq", async (username, callback) => {
-		// try {
-		// 	const newUser = await prisma.user.create({
-		// 		data: {
-		// 			username: username,
-		// 		},
-		// 	});
-		// 	function slumpaTal() {
-		// 		return Math.floor(Math.random() * 25) + 1;
-		// 	}
-		// 	debug(slumpaTal());
-
-
-
-			// 1. Hitta ett rum som bara har en user
-
-			// const gameRooms = await prisma.gameroom.findMany({
-			// 	include: {
-			// 		users: true,
-			// 	},
-			// });
-
-			// console.log("Game rooms:", gameRooms);
-
-			// const availableRoom = gameRooms.find(
-			// 	(room) => room.users.length === 1
-			// );
-
-			// console.log("Available room:", availableRoom);
-
-	// 		// 2. Om det finns, joina rummet
-	// 		if (availableRoom) {
-	// 			await prisma.gameroom.update({
-	// 				where: {
-	// 					id: availableRoom.id,
-	// 				},
-	// 				data: {
-	// 					users: {
-	// 						connect: {
-	// 							id: newUser.id,
-	// 						},
-	// 					},
-	// 				},
-	// 			}); // Hur skriver vi detta?
-
-	// 			// Add user to socket
-	// 			socket.join(availableRoom.id);
-	// 			// Emitta event till socket(?) med roomId
-	// 			// Detta eventet skickar bara till ovriga
-	// 			// io.to(availableRoom.id).emit("userJoinedRoom", username);
-	// 			// Ska vi skicka till alla?
-	// 			io.to(availableRoom.id).emit("gameStart", availableRoom);
-	// 			debug(`This is the availableroomData;`, availableRoom.users);
-	// 		} else {
-	// 			// 3. Om det inte finns, skapa ett nytt rum och joina det
-
-	// 			const newRoom = await createRoom(newUser.id);
-
-	// 			console.log("New room created:", newRoom);
-
-	// 			socket.join(newRoom.id);
-	// 		}
-	// 		// debug("User wants to join", username);
-	// 	} catch (error) {
-	// 		console.error("Error while handling userJoinReq", error);
-	// 		callback(false, 0, 0);
-	// 	}
-	// });
-
-
-
-// const createRoom = async (userId: string) => {
-// 	const newRoom = await prisma.gameroom.create({
-// 		data: {
-// 			users: {
-// 				connect: {
-// 					id: userId,
-// 				},
-// 			},
-// 		},
-// 	});
-
-// 	return newRoom;
-// };
-
-// const updateRoom = async (user: any) => {
-// 	const updatedRoom = await prisma.gameroom.update({
-// 		where: {
-// 			users: {
-
-// 			}
-// 		}
-// 	})
-// }
-
-// playerCount.push(username);
-// console.log(playerCount);
-// const newUser: createUserInput = await prisma.user.create({
-// 	data: {
-// 		id: socket.id,
-// 		username,
-// 	}
-// })
-
-// Första spelare joinar > skapa spelrum > socket.join
-// Andra spelare joinar > leta efter lediga rum > hittar inget med mindre än 2 spelare > socket.join
-// Tredje spelare joinar > letar efter lediga rum > hittar inte > skapa spelrum > socket.join

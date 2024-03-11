@@ -175,15 +175,17 @@ socket.on("latestReactiontime", (usersInRoom) => {
   }, 3000);
 });
 
-socket.on("nextRound", (roomId, RoundIndex, virusShow, virusInterval) => {
-  console.log(roomId, RoundIndex);
+socket.on("nextRound", (roomId, virusShow, virusInterval) => {
+  console.log(roomId);
   getDivandPutvirus(virusShow, virusInterval);
+  currentRound++;
+  console.log("Det här är rundan", currentRound);
   // resetTimer();
 })
-socket.on("gameOver", (gameroom) => {
+socket.on("gameOver", (roomId) => {
   highscoreDiv.classList.remove("hide");
   gameDiv.classList.add("hide");
-  console.log("Game Over! Results:", gameroom);
+  alert("Game Over! Fuck you");
 })
 
 //stopwatch
@@ -195,25 +197,30 @@ let seconds = 0;
 
 const display = document.querySelector('#display') as HTMLHeadingElement;
 
-function startStoptimer() {
+function startstopWatch() {
   if (!isRunning) {
     timer = setInterval(runStopwatch, 10);
     isRunning = true;
-  } else {
+  }
+}
+
+function stopStopwatch() {
+  if (isRunning) {
     clearInterval(timer);
     isRunning = false;
   }
 }
 
+
 function runStopwatch() {
-  // milliseconds++;
-  // if (milliseconds === 100) {
-  //     milliseconds = 0;
-  //     seconds++;
-  // }
-  const elapsedTime = Date.now() - startTime;  // 2337 ms
-  const seconds = Math.floor(elapsedTime / 1000);  // 2
-  const milliseconds = elapsedTime - (seconds * 1000);   // 2337 - 2000 = 337
+  milliseconds++;
+  if (milliseconds === 100) {
+    milliseconds = 0;
+    seconds++;
+  }
+  // const elapsedTime = Date.now() - startTime;  // 2337 ms
+  // const seconds = Math.floor(elapsedTime / 1000);  // 2
+  // const milliseconds = elapsedTime - (seconds * 1000);   // 2337 - 2000 = 337
 
   display.innerHTML =
     (seconds < 10 ? '0' + seconds : seconds) + '.' +
@@ -246,13 +253,13 @@ function getDivandPutvirus(virusShow: number, virusInterval: number) {
 
   if (divElement) {
     setTimeout(function () {
-      divElement.innerHTML = `<span class="knife" id="virusEmoji">&#129503;</span>`;
+      divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
       console.log(divElement);
       startTimer();
-      startStoptimer();
+      startstopWatch();
       divElement.addEventListener("click", () => {
-        startStoptimer();
-        divElement.classList.add("hide");
+        stopStopwatch();
+        divElement.innerHTML = "";
         virusPressed = virusClicked();
         let userId = socket.id;
 
