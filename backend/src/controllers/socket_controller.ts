@@ -10,6 +10,8 @@ import { createUserInput } from "@shared/types/Models";
 // Create a new debug instance
 const debug = Debug("backend:socket_controller");
 
+let clickedarray = [];
+
 interface Round {
 	[key: string]: number;
 }
@@ -129,8 +131,72 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 	callback(username);
 
 	});
-	socket.on("virusClick", (roomId: string, username: string, virusPressed: number) => {
+	socket.on("virusClick", async (userId: string, roomId: string, username: string, virusPressed: number) => {
 		debug("Time it took to click", virusPressed.toFixed(1));
+		clickedarray.push(virusPressed);
+		if(clickedarray.length === 10){
+			//ta ut genomsnittstiden av tio och logga i usermodel som average time.
+		}
+
+		const resetUserbeforeUpdate = await prisma.user.update({
+			where: {
+				id: userId
+			},
+			data: {
+				virusClicked: null
+			},
+		});
+
+		const userthatPressed = await prisma.user.update({
+			where: {
+				id: userId
+			},
+			data: {
+				virusClicked: virusPressed
+			}
+		});
+		debug("The user has pressed", userthatPressed);
+
+		//hitta rummet användarna befinner sig i för att kunna jämföra
+		const findRoomtocompare = await prisma.gameroom.findUnique({
+			where: {
+				id: roomId
+			},
+			include: {
+				users: true
+			},
+		});
+		debug("fint the room that the users are put in", findRoomtocompare);
+		if(!findRoomtocompare){
+			return;
+		}
+
+		const usersInRoom = findRoomtocompare.users.map(user => user)
+        debug("This is arrayround", usersInRoom);
+        if(usersInRoom.length === 2){
+            const user1 = usersInRoom[0];
+            debug("This is user1", user1)
+            const user2 = usersInRoom[1];
+            debug("This is user2", user2)
+
+			if (user1.virusClicked && user2.virusClicked) {
+				// Jämför rounds och tilldela poäng
+				if (user1.virusClicked < user2.virusClicked) {
+					io.to(roomId).emit("roundWinner", usersInRoom[0] )
+				  debug(`User 1 ${user1.username} får ett poäng.`);
+				} else if (user1.virusClicked > user2.virusClicked) {
+					io.to(roomId).emit("roundWinner", usersInRoom[1] )
+				  debug(` User 2 ${user2.username} får ett poäng.`);
+				} else {
+				  debug('Ingen vinner, rounds är lika.');
+				}
+			  } else {
+				debug('En eller båda användarna är null.');
+			  }
+			}
+			io.to(roomId).emit("latestReactiontime", usersInRoom)
+
+
 
 		// Hitta vilken runda det vi ska registrera score för
 		const availableRoundIndex = getRound(rooms[roomId].rounds);
@@ -156,7 +222,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 			// Om båda spelarna har klickat, skicka nästa runda
 			if (availableRoundIndex !== 10) {
-				io.to(roomId).emit("nextRound", roomId, availableRoundIndex + 1);
+				//uppdatera användaren med tiden det tog att klicka
+
+
+				io.to(roomId).emit("nextRound", roomId, availableRoundIndex + 1, randomNumber(), randomInterval);
+				debug(rooms[roomId].rounds);
+				debug("what round are we at?", availableRoundIndex);
 			} else {
 				// Avsluta spel
 				// Event till alla i rummet

@@ -17,6 +17,16 @@ const gameDiv = document.querySelector("#game") as HTMLDivElement;
 const waitingDiv = document.querySelector(".waiting") as HTMLDivElement;
 const highscoreDiv = document.querySelector(".highscoreDiv") as HTMLDivElement;
 
+
+const playerOneParagraph = document.querySelector(".playerOne") as HTMLParagraphElement;
+const playerTwoParagraph = document.querySelector(".playerTwo") as HTMLParagraphElement;
+
+const playerOneResult = document.querySelector("#playerOneResult") as HTMLParagraphElement;
+const playerTwoResult = document.querySelector("#playerTwoResult") as HTMLParagraphElement;
+
+const playerOneLatestTime = document.querySelector("#playerOneLatestTime") as HTMLParagraphElement;
+const playerTwoLatestTime = document.querySelector("#playerTwoLatestTime") as HTMLParagraphElement;
+
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
@@ -27,7 +37,8 @@ let startTime: number;
 let virusPressed: number;
 let currentRound = 0;
 let currentRoomId: string = "";
-
+let playerOneRoundCount = 0;
+let playerTwoRoundCount = 0;
 
 startDiv.classList.remove("hide");
 gameDiv.classList.add("hide");
@@ -118,8 +129,55 @@ userSubmit.addEventListener("submit", (e) => {
   // }
     
   });
-  socket.on("nextRound", (roomId, RoundIndex) => {
+
+  socket.on("roundWinner", (usersInRoom) => {
+    const userswithResult = usersInRoom;
+    console.log(userswithResult);
+
+    //Sätt ut rundans vinnare i DOM
+    if (usersInRoom.username === playerOneParagraph.innerText) {
+      playerOneRoundCount++;
+      console.log("username1", username);
+      playerOneResult.innerText = `${playerOneRoundCount}`;
+          
+
+    } else {
+      playerTwoRoundCount++;
+      console.log("username2:", username);
+      playerTwoResult.innerText = `${playerTwoRoundCount}`;
+      
+
+    }
+
+  });
+
+  socket.on("latestReactiontime", (usersInRoom) => {
+      if(usersInRoom[0].virusClicked){
+
+      let virusClickedInSeconds1: string = (usersInRoom[0].virusClicked / 1000).toFixed(3);
+      playerOneLatestTime.textContent = virusClickedInSeconds1;
+      console.log("Playerone latest time", virusClickedInSeconds1)
+      }
+
+      if(usersInRoom[1].virusClicked){
+        let virusClickedInSeconds2: string = (usersInRoom[1].virusClicked / 1000).toFixed(3);
+        playerTwoLatestTime.textContent = virusClickedInSeconds2;
+        console.log("Playertwo latest time", virusClickedInSeconds2)
+
+        }
+
+
+    setTimeout(() => {
+      resetTimer();
+      // playerOneLatestTime.textContent = "00:00:00"
+      // playerTwoLatestTime.textContent = "00:00:00"
+
+    }, 3000);
+  });
+
+  socket.on("nextRound", (roomId, RoundIndex, virusShow, virusInterval) => {
     console.log(roomId, RoundIndex);
+    getDivandPutvirus(virusShow, virusInterval);
     // resetTimer();
   })
   socket.on("gameOver", (gameroom) => {
@@ -164,11 +222,10 @@ function resetTimer() {
   milliseconds = 0;
   seconds = 0;
   display.innerHTML = '00:00:00';
-} console.log(resetTimer()); //använd senare
+} 
+// console.log(resetTimer()); //använd senare
 
 function setupGameView(users: string[]){
-    const playerOneParagraph = document.querySelector(".playerOne") as HTMLParagraphElement;
-    const playerTwoParagraph = document.querySelector(".playerTwo") as HTMLParagraphElement;
     startDiv.classList.add("hide");
     waitingDiv.classList.add("hide");
     gameDiv.classList.remove("hide");
@@ -193,8 +250,13 @@ function getDivandPutvirus(virusShow: number, virusInterval: number) {
         startStoptimer();
         divElement.classList.add("hide");
         virusPressed = virusClicked();
+        let userId = socket.id;
+
+        if (!userId) {
+          return;
+        }
         // virusClicked();
-        socket.emit("virusClick", currentRoomId, username, virusPressed);
+        socket.emit("virusClick", userId, currentRoomId, username, virusPressed);
         // // round logic
         // console.log(currentRound);
         // currentRound++; 
