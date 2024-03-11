@@ -118,8 +118,8 @@ userSubmit.addEventListener("submit", (e) => {
   // }
     
   });
-  socket.on("nextRound", (roomId, round) => {
-    console.log(roomId, round);
+  socket.on("nextRound", (roomId, RoundIndex) => {
+    console.log(roomId, RoundIndex);
     // resetTimer();
   })
   socket.on("gameOver", (gameroom) => {
