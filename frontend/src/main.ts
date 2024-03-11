@@ -1,7 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import {
   ClientToServerEvents,
-  GameRoomInterface,
   // RoomInfo,
   ServerToClientEvents,
 } from "@shared/types/SocketTypes";
@@ -182,7 +181,7 @@ socket.on("nextRound", (roomId, virusShow, virusInterval) => {
   console.log("Det här är rundan", currentRound);
   // resetTimer();
 })
-socket.on("gameOver", (roomId) => {
+socket.on("gameOver", () => {
   highscoreDiv.classList.remove("hide");
   gameDiv.classList.add("hide");
   alert("Game Over! Fuck you");
