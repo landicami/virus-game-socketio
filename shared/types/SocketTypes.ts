@@ -10,6 +10,7 @@ export interface ServerToClientEvents {
   roundWinner: (userInRoom: UsersInroom) => void;
   latestReactiontime: (usersInRoom: UsersInroom[]) => void;
   highscore: (creatingHighscore: highscoreFromUser[]) => void;
+  playedGames: (creatingPlayedGames: playedGamesUser[]) => void;
 }
 
 // Events emitted by the client to the server
@@ -46,4 +47,14 @@ export interface highscoreFromUser {
   id: string
   username: string
   averageTimeFromUser: number
+}
+
+export interface playedGamesUser {
+  id: string
+  createdAt: Date | null
+  userOne:string
+  userTwo:string
+  userOneScore: number | null
+  userTwoScore: number | null
+  gameroomId:string | null
 }

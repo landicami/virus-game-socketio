@@ -26,6 +26,7 @@ const playerOneLatestTime = document.querySelector("#playerOneLatestTime") as HT
 const playerTwoLatestTime = document.querySelector("#playerTwoLatestTime") as HTMLParagraphElement;
 
 const highscoreUlEl = document.querySelector("#highscoreUl") as HTMLUListElement;
+const playedGamesUlEl = document.querySelector("#recentGamesUl") as HTMLUListElement;
 
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
@@ -100,18 +101,21 @@ userSubmit.addEventListener("submit", (e) => {
     }
     console.log("User has joined through back and front", callback);
     username = callback;
-    
-
   }
-
-
   );
 });
 
-socket.on("highscore", (allHighscores)=>{
-  console.log("All highscores", allHighscores);
-  highscoreUlEl.innerHTML = allHighscores.map(user => `<li>${user.username} - ${user.averageTimeFromUser}`).join("");
-});
+  socket.on("highscore", (allHighscores)=>{
+    console.log("All highscores", allHighscores);
+    highscoreUlEl.innerHTML = allHighscores.map(user => `<li>${user.username} - ${user.averageTimeFromUser}`).join("");
+  });
+
+  socket.on("playedGames", (allPlayedGames)=>{
+    console.log("All highscores", allPlayedGames);
+    playedGamesUlEl.innerHTML = allPlayedGames.map(game => `<li>${game.userOne}: ${game.userOneScore} - ${game.userTwo}: ${game.userTwoScore}`).join("");
+  });
+
+
 
 
 
