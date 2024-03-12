@@ -26,7 +26,9 @@ const playerOneLatestTime = document.querySelector("#playerOneLatestTime") as HT
 const playerTwoLatestTime = document.querySelector("#playerTwoLatestTime") as HTMLParagraphElement;
 
 const highscoreUlEl = document.querySelector("#highscoreUl") as HTMLUListElement;
-
+const gameOverDiv = document.querySelector("#gameOver") as HTMLDivElement;
+const winnerOrLoser = document.querySelector("#winnerOrLoser") as HTMLHeadingElement;
+const nextRound = document.querySelector("#nextRound") as HTMLParagraphElement;
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
@@ -197,7 +199,11 @@ socket.on("nextRound", (roomId, virusShow, virusInterval) => {
 socket.on("gameOver", () => {
   highscoreDiv.classList.remove("hide");
   gameDiv.classList.add("hide");
-  alert("Game Over! Fuck you");
+  gameOverDiv.classList.remove("hide");
+  winnerOrLoser.innerText = `Game is over!`;
+  nextRound.innerText =`Do you wanna play our awesome game again?`;
+ 
+  // alert("Game Over! Fuck you");
 });
 
 
