@@ -172,6 +172,12 @@ export const handleConnection = (
 		}
 
 		const usersInRoom = findRoomtocompare.users.map(user => user)
+		let userOne = usersInRoom[0];
+		const averageClick1 = userOne.averageTime;
+		let userTwo = usersInRoom[1];
+		const averageClick2 = userTwo.averageTime;
+
+
 		debug("This is arrayround", usersInRoom);
 		if (usersInRoom.length === 2) {
 			const user1 = usersInRoom[0];
@@ -179,6 +185,8 @@ export const handleConnection = (
 			const user2 = usersInRoom[1];
 			debug("This is user2", user2)
 			// io.to(roomId).emit("latestReactiontime", usersInRoom)
+
+
 
 			if (!user1.virusClicked || !user2.virusClicked) {
 				// båda har inte klickat ännu
@@ -210,7 +218,61 @@ export const handleConnection = (
 				currentRound: currentRoundinRoom
 			},
 		});
-		if (findRoomAndUpdateRounds.currentRound === 4) {
+
+		function averageClickTime1(){
+			let sum1 = 0;
+			for(let i = 0; i <averageClick1.length; i++){
+				sum1 += averageClick1[i];
+			}
+			debug("sum1", sum1)
+			return sum1 / 10;
+		}
+		const finalAverageTime1 = averageClickTime1();
+
+		function averageClickTime2(){
+			let sum2 = 0;
+			for(let i = 0; i <averageClick2.length; i++){
+				sum2 += averageClick2[i];
+			}
+			debug("sum2", sum2);
+			return sum2 / 10;
+		}
+
+		const finalAverageTime2 = averageClickTime2();
+;
+
+		if (findRoomAndUpdateRounds.currentRound === 10) {
+			debug("final1", finalAverageTime1);
+			debug("final2", finalAverageTime2);
+
+			const creatingHighscore1 = await prisma.highscore.create({
+				data: {
+					username: userOne.username,
+					averageTimeFromUser: finalAverageTime1,
+				},
+			});
+
+			const creatingHighscore2 = await prisma.highscore.create({
+				data: {
+					username: userTwo.username,
+					averageTimeFromUser: finalAverageTime2,
+				},
+			});
+			debug(creatingHighscore1,creatingHighscore2);
+
+
+			const allHighscores = await prisma.highscore.findMany({
+				orderBy: {
+					averageTimeFromUser: "asc"
+				},
+				take: 5,
+			});
+
+			io.emit("highscore", allHighscores );
+			// socket.emit("highscore", creatingHighscore2 );
+
+
+
 			debug("VI vill inte fortsätta med någonting");
 			io.to(roomId).emit("gameOver", roomId);
 			//emitta gamestop
@@ -248,49 +310,49 @@ export const handleConnection = (
 		// io.to(roomId).emit("nextRound", roomId, availableRoundIndex + 1, randomNumber(), randomInterval);
 
 		// Hitta vilken runda det vi ska registrera score för
-		const availableRoundIndex = getRound(rooms[roomId].rounds);
-		debug("du är på rad 198", availableRoundIndex);
+	// 	const availableRoundIndex = getRound(rooms[roomId].rounds);
+	// 	debug("du är på rad 198", availableRoundIndex);
 
-		if (availableRoundIndex === null) {
-			// Skapa en ny runda och lägg till score för user
-			rooms[roomId].rounds.push({
-				[username]: virusPressed,
-			})
-			// rounds:[
-			// ...
-			// { player1: 2.5 }
-			//]
-			debug("Går du inte här i ifsatsen på rad 208?", rooms[roomId].rounds)
-		} else {
-			// Varför funkar detta?
-			rooms[roomId].rounds[availableRoundIndex][username] = virusPressed;
-			// rooms['rum1233542345234234234'].rounds[3]['player99] = 55;
-			// rounds:[
-			// ...
-			// { player1: 2.5, player99: 55},
-			//]
-			// Lägg till score för användaren i den aktuella rundan
+	// 	if (availableRoundIndex === null) {
+	// 		// Skapa en ny runda och lägg till score för user
+	// 		rooms[roomId].rounds.push({
+	// 			[username]: virusPressed,
+	// 		})
+	// 		// rounds:[
+	// 		// ...
+	// 		// { player1: 2.5 }
+	// 		//]
+	// 		debug("Går du inte här i ifsatsen på rad 208?", rooms[roomId].rounds)
+	// 	} else {
+	// 		// Varför funkar detta?
+	// 		rooms[roomId].rounds[availableRoundIndex][username] = virusPressed;
+	// 		// rooms['rum1233542345234234234'].rounds[3]['player99] = 55;
+	// 		// rounds:[
+	// 		// ...
+	// 		// { player1: 2.5, player99: 55},
+	// 		//]
+	// 		// Lägg till score för användaren i den aktuella rundan
 
-			// Om båda spelarna har klickat, skicka nästa runda
-			debug("Går du inte här i ifsatsen på rad 220?")
+	// 		// Om båda spelarna har klickat, skicka nästa runda
+	// 		debug("Går du inte här i ifsatsen på rad 220?")
 
-			if (availableRoundIndex !== 10) {
-				debug("Går du inte här i ifsatsen på rad 223?")
+	// 		if (availableRoundIndex !== 10) {
+	// 			debug("Går du inte här i ifsatsen på rad 223?")
 
-				//uppdatera användaren med tiden det tog att klicka
-				//nolla för båda spelarna i rummet
+	// 			//uppdatera användaren med tiden det tog att klicka
+	// 			//nolla för båda spelarna i rummet
 
-				debug(rooms[roomId].rounds);
-				debug("what round are we at?", availableRoundIndex);
-			} else {
-				// Avsluta spel
-				// Event till alla i rummet
-				// Spara i DB
-				// delete rooms[roomId];
-			}
+	// 			debug(rooms[roomId].rounds);
+	// 			debug("what round are we at?", availableRoundIndex);
+	// 		} else {
+	// 			// Avsluta spel
+	// 			// Event till alla i rummet
+	// 			// Spara i DB
+	// 			// delete rooms[roomId];
+	// 		}
 
-			debug("Room status:", JSON.stringify(rooms[roomId]));
-		}
-	});
+	// 		debug("Room status:", JSON.stringify(rooms[roomId]));
+	// 	}
+	 });
 
 };

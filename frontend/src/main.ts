@@ -25,6 +25,8 @@ const playerTwoResult = document.querySelector("#playerTwoResult") as HTMLParagr
 const playerOneLatestTime = document.querySelector("#playerOneLatestTime") as HTMLParagraphElement;
 const playerTwoLatestTime = document.querySelector("#playerTwoLatestTime") as HTMLParagraphElement;
 
+const highscoreUlEl = document.querySelector("#highscoreUl") as HTMLUListElement;
+
 // Connect to Socket.IO Server
 console.log("Connecting to Socket.IO Server at:", SOCKET_HOST);
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
@@ -62,6 +64,12 @@ socket.on("connect", () => {
   console.log("🔗 Socket ID:", socket.id);
 });
 
+socket.on("highscore", (allHighscores)=>{
+  console.log("All highscores", allHighscores);
+  highscoreUlEl.innerHTML = allHighscores.map(user => `<li>${user.username} - ${user.averageTimeFromUser}`).join("");
+});
+
+
 // Listen for when server got tired of us
 socket.on("disconnect", () => {
   console.log("💀 Disconnected from the server:", SOCKET_HOST);
@@ -94,9 +102,14 @@ userSubmit.addEventListener("submit", (e) => {
     }
     console.log("User has joined through back and front", callback);
     username = callback;
+    
   }
+
+
   );
 });
+
+
 
 socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
   console.log("Now the game will start, with the", gameroom);
@@ -181,7 +194,9 @@ socket.on("gameOver", () => {
   highscoreDiv.classList.remove("hide");
   gameDiv.classList.add("hide");
   alert("Game Over! Fuck you");
-})
+});
+
+
 
 //stopwatch
 

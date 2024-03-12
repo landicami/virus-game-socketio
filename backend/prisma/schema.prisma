@@ -23,13 +23,13 @@ model User {
   room          Gameroom?    @relation(fields: [roomId], references: [id])
   playedgames   PlayedGames? @relation(fields: [playedgamesId], references: [id])
   playedgamesId String?      @db.ObjectId
-  highscores    Highscore?   @relation(fields: [higscoresId], references: [id])
   higscoresId   String?      @db.ObjectId
 }
 
 model Highscore {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  user User[]
+  id                  String @id @default(auto()) @map("_id") @db.ObjectId
+  username            String
+  averageTimeFromUser Int
 }
 
 model PlayedGames {
