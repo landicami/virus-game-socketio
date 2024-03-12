@@ -95,7 +95,7 @@ export const handleConnection = (
 
 		const allPlayedGames =  await prisma.playedGames.findMany({
 			orderBy: {
-				createdAt: "asc", // or "id: "desc""
+				createdAt: "desc", // or "id: "desc""
 			  },
 			  take: 5,
 		});
