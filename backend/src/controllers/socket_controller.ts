@@ -11,6 +11,7 @@ import {
 import prisma from "../prisma";
 import { createUserInput } from "@shared/types/Models";
 import { userInfo } from "os";
+import { resolve } from "path";
 
 // Create a new debug instance
 const debug = Debug("backend:socket_controller");
@@ -73,8 +74,26 @@ export const handleConnection = (
 	io: Server<ClientToServerEvents, ServerToClientEvents>
 ) => {
 	debug("🙋 A user connected", socket.id);
+
+	async function test(){
+		const allHighscores =  await prisma.highscore.findMany({
+			orderBy: {
+				averageTimeFromUser: "asc"
+			},
+			take: 5,
+		});
+
+		io.emit("highscore", allHighscores);
+	}
+
+	test();
+	// debug("allscores", allScores);
+
+
+
 	socket.on("userJoinReq", async (username, callback) => {
 		debug("Användare vill ansluta", username);
+
 
 		// Hitta ett befintligt rum med färre än 2 användare
 		let existingRoom = activeGameRooms.find(
@@ -141,6 +160,7 @@ export const handleConnection = (
 		callback(username);
 
 	});
+
 	socket.on("virusClick", async (userId: string, roomId: string, username: string, virusPressed: number) => {
 		debug("Time it took to click", virusPressed.toFixed(1));
 
@@ -261,14 +281,9 @@ export const handleConnection = (
 			debug(creatingHighscore1,creatingHighscore2);
 
 
-			const allHighscores = await prisma.highscore.findMany({
-				orderBy: {
-					averageTimeFromUser: "asc"
-				},
-				take: 5,
-			});
 
-			io.emit("highscore", allHighscores );
+
+
 			// socket.emit("highscore", creatingHighscore2 );
 
 

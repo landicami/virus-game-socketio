@@ -64,10 +64,7 @@ socket.on("connect", () => {
   console.log("🔗 Socket ID:", socket.id);
 });
 
-socket.on("highscore", (allHighscores)=>{
-  console.log("All highscores", allHighscores);
-  highscoreUlEl.innerHTML = allHighscores.map(user => `<li>${user.username} - ${user.averageTimeFromUser}`).join("");
-});
+
 
 
 // Listen for when server got tired of us
@@ -96,6 +93,7 @@ userSubmit.addEventListener("submit", (e) => {
   }
 
   socket.emit("userJoinReq", trimmedUsername, (callback) => {
+
     if (!callback) {
       alert("GET THE HELL OUT OF MY FACE");
       return;
@@ -103,10 +101,16 @@ userSubmit.addEventListener("submit", (e) => {
     console.log("User has joined through back and front", callback);
     username = callback;
     
+
   }
 
 
   );
+});
+
+socket.on("highscore", (allHighscores)=>{
+  console.log("All highscores", allHighscores);
+  highscoreUlEl.innerHTML = allHighscores.map(user => `<li>${user.username} - ${user.averageTimeFromUser}`).join("");
 });
 
 
