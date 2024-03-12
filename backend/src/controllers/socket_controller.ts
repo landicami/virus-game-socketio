@@ -292,4 +292,5 @@ export const handleConnection = (
 			debug("Room status:", JSON.stringify(rooms[roomId]));
 		}
 	});
+
 };
