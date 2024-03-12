@@ -7,6 +7,7 @@ import {
 	ClientToServerEvents,
 	GameRoomInterface,
 	ServerToClientEvents,
+	playedGamesUser,
 } from "@shared/types/SocketTypes";
 import prisma from "../prisma";
 import { createUserInput } from "@shared/types/Models";
@@ -18,6 +19,8 @@ const debug = Debug("backend:socket_controller");
 
 let clickedarray: number[] = [];
 let currentRoundinRoom = 0;
+let user1count = 0;
+let user2count = 0;
 
 interface Round {
 	[key: string]: number;
@@ -77,7 +80,7 @@ export const handleConnection = (
 
 	async function findingHighscores(){
 		const allHighscores =  await prisma.highscore.findMany({
-			orderBy: {
+			orderBy:{
 				averageTimeFromUser: "asc"
 			},
 			take: 5,
@@ -87,6 +90,29 @@ export const handleConnection = (
 	}
 
 	findingHighscores();
+
+	async function findingLastPlayedGames(){
+
+		const allPlayedGames =  await prisma.playedGames.findMany({
+			orderBy: {
+				createdAt: "desc", // or "id: "desc""
+			  },
+			  take: 5,
+		});
+		const playedGamesData: playedGamesUser[] = allPlayedGames.map(game => ({
+			id: game.id,
+			createdAt: game.createdAt,
+			userOne: game.userOne,
+			userTwo: game.userTwo,
+			userOneScore: game.userOneScore,
+			userTwoScore: game.userTwoScore,
+			gameroomId: game.gameroomId
+		}));
+
+		io.emit("playedGames", playedGamesData);
+	}
+
+	findingLastPlayedGames();
 	// debug("allscores", allScores);
 
 
@@ -156,6 +182,7 @@ export const handleConnection = (
 			}
 
 			debug("the newroomid", newRoom.id);
+
 		}
 		callback(username);
 
@@ -218,10 +245,29 @@ export const handleConnection = (
 			if (user1.virusClicked < user2.virusClicked) {
 				io.to(roomId).emit("roundWinner", user1)
 				debug(`User 1 ${user1.username} får ett poäng.`);
+				user1count++;
+				await prisma.user.update({
+					where: {
+						id: user1.id
+					},
+					data:{
+						score: user1count
+					}
+				});
 			} else {
 				io.to(roomId).emit("roundWinner", user2)
 				debug(` User 2 ${user2.username} får ett poäng.`);
+				user2count++;
+				await prisma.user.update({
+					where: {
+						id: user2.id
+					},
+					data:{
+						score: user2count
+					}});
 			}
+			debug("USer1 score", user1count);
+			debug("USer2 score", user2count);
 			// } else {
 			// 	debug('En eller båda användarna är null.');
 			// }
@@ -270,7 +316,6 @@ export const handleConnection = (
 					averageTimeFromUser: finalAverageTime1,
 				},
 			});
-
 			const creatingHighscore2 = await prisma.highscore.create({
 				data: {
 					username: userTwo.username,
@@ -279,19 +324,25 @@ export const handleConnection = (
 			});
 			debug(creatingHighscore1,creatingHighscore2);
 
-
-
+			let timeCreatedGame = new Date;
+			const creatingPlayedGames = await prisma.playedGames.create({
+				data: {
+					createdAt: timeCreatedGame,
+					userOne: userOne.username,
+					userTwo: userTwo.username,
+					userOneScore: userOne.score,
+					userTwoScore: userTwo.score,
+					gameroomId: roomId,
+				},
+			});
+			debug("creatingPlayedGames", creatingPlayedGames.userOne)
 			debug("foundRoom CurrentRound", findRoomAndUpdateRounds.currentRound)
-
 			// socket.emit("highscore", creatingHighscore2 );
-
-
-
 			debug("VI vill inte fortsätta med någonting");
 			findingHighscores();
+			findingLastPlayedGames();
 			io.to(roomId).emit("gameOver", roomId);
 			//emitta gamestop
-
 		}
 
 		const roomwithUsers = await prisma.gameroom.findUnique({

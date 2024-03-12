@@ -15,15 +15,15 @@ model Gameroom {
 }
 
 model User {
-  id            String       @id @map("_id")
+  id            String    @id @map("_id")
   username      String
-  roomId        String?      @db.ObjectId
+  roomId        String?   @db.ObjectId
   virusClicked  Int?
   averageTime   Int[]
-  room          Gameroom?    @relation(fields: [roomId], references: [id])
-  playedgames   PlayedGames? @relation(fields: [playedgamesId], references: [id])
-  playedgamesId String?      @db.ObjectId
-  higscoresId   String?      @db.ObjectId
+  score         Int?
+  room          Gameroom? @relation(fields: [roomId], references: [id])
+  playedgamesId String?   @db.ObjectId
+  higscoresId   String?   @db.ObjectId
 }
 
 model Highscore {
@@ -33,10 +33,14 @@ model Highscore {
 }
 
 model PlayedGames {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  user       User[]
-  Gameroom   Gameroom? @relation(fields: [gameroomId], references: [id])
-  gameroomId String?   @db.ObjectId
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime?
+  userOne      String
+  userTwo      String
+  userOneScore Int?
+  userTwoScore Int?
+  Gameroom     Gameroom? @relation(fields: [gameroomId], references: [id])
+  gameroomId   String?   @db.ObjectId
 }
 
 // Not complete, may have to change. This is just a example on highscore for now
