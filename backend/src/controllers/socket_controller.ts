@@ -75,7 +75,7 @@ export const handleConnection = (
 ) => {
 	debug("🙋 A user connected", socket.id);
 
-	async function test(){
+	async function findingHighscores(){
 		const allHighscores =  await prisma.highscore.findMany({
 			orderBy: {
 				averageTimeFromUser: "asc"
@@ -86,7 +86,7 @@ export const handleConnection = (
 		io.emit("highscore", allHighscores);
 	}
 
-	test();
+	findingHighscores();
 	// debug("allscores", allScores);
 
 
@@ -260,7 +260,6 @@ export const handleConnection = (
 
 		const finalAverageTime2 = averageClickTime2();
 ;
-
 		if (findRoomAndUpdateRounds.currentRound === 10) {
 			debug("final1", finalAverageTime1);
 			debug("final2", finalAverageTime2);
@@ -282,13 +281,14 @@ export const handleConnection = (
 
 
 
-
+			debug("foundRoom CurrentRound", findRoomAndUpdateRounds.currentRound)
 
 			// socket.emit("highscore", creatingHighscore2 );
 
 
 
 			debug("VI vill inte fortsätta med någonting");
+			findingHighscores();
 			io.to(roomId).emit("gameOver", roomId);
 			//emitta gamestop
 
