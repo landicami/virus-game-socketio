@@ -253,6 +253,7 @@ export const handleConnection = (
 						score: newScore
 					}
 				});
+				io.to(gameroom.id).emit("roundWinner", user2)
 			}
 		}
 		io.to(gameroom.id).emit("latestReactiontime", usersInRoom, gameroom.id)
@@ -379,15 +380,18 @@ export const handleConnection = (
 					debug("VI vill inte fortsätta med någonting");
 					findingHighscores();
 					findingLastPlayedGames();
-					endGame(gameroom.id)
+
 
 					// Ta bort det specifika rummet och användare
 
-					async function endGame(roomId: string){
+/* 					async function endGame(roomId: string){
 						try{
 							const room = await prisma.gameroom.findUnique({
 								where: {
 									id: roomId
+								},
+								include: {
+									users: true,
 								}
 							});
 
@@ -402,9 +406,32 @@ export const handleConnection = (
 						}catch(error){
 							console.error("error ending game");
 						}
-					};
+					}; */
+
+					const usersInRoomToDelete = await prisma.user.findMany({
+                        where: {
+                            roomId: gameroom.id
+                        }
+                    });
+
+                    // Ta bort varje användare i rummet
+                    for (const user of usersInRoomToDelete) {
+                        await prisma.user.delete({
+                            where: {
+                                id: user.id
+                            }
+                        });
+                    }
+
+                    // Ta bort själva rummet
+                    await prisma.gameroom.delete({
+                        where: {
+                            id: gameroom.id
+                        }
+                    });
 
 					io.to(gameroom.id).emit("gameOver", endGameUsers);
+					// endGame(gameroom.id)
 			}
 
 
