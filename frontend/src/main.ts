@@ -237,12 +237,14 @@ socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
   console.log("Det här är rundan", currentRound);
   // resetTimer();
 })
-socket.on("gameOver", () => {
+socket.on("gameOver", (usersInRoom) => {
+  const userOneResult = usersInRoom[0];
+  const userTwoResult = usersInRoom[1];
   highscoreDiv.classList.remove("hide");
   gameDiv.classList.add("hide");
   gameOverDiv.classList.remove("hide");
   winnerOrLoser.innerText = `Game is over!`;
-  nextRound.innerText = `Do you wanna play our awesome game again?`;
+  nextRound.innerText = `The result was: ${userOneResult.username}: ${userOneResult.score} - ${userTwoResult.username}: ${userTwoResult.score}`;
 
   // alert("Game Over! Fuck you");
 });

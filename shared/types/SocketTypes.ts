@@ -6,7 +6,7 @@ export { };
 export interface ServerToClientEvents {
   gameStart: (gameroom: GameRoomInterface, virusShow: number, virusInterval: number) => void;
   nextRound: (gameroom: GameRoomInterface, virusShow: number, virusInterval: number) => void;
-  gameOver: (roomId: string) => void;
+  gameOver: (usersInRoom: UserInroom[]) => void;
   roundWinner: (userInRoom: UserInroom) => void;
   latestReactiontime: (usersInRoom: UserInroom[], roomId: string) => void;
   highscore: (creatingHighscore: highscoreFromUser[]) => void;

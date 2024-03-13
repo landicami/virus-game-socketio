@@ -352,14 +352,19 @@ export const handleConnection = (
 							userTwoScore: userTwoWithTenClick.score,
 						},
 					});
-					debug("creatingPlayedGames", creatingPlayedGames.userOne)
+					debug("creatingPlayedGames", creatingPlayedGames.userOneScore)
 
 					// socket.emit("highscore", creatingHighscore2 );
 					debug("VI vill inte fortsätta med någonting");
 					findingHighscores();
 					findingLastPlayedGames();
-					await prisma.user.deleteMany({});
-					io.to(gameroom.id).emit("gameOver", gameroom.id);
+
+					io.to(gameroom.id).emit("gameOver", usersInRoom);
+					await prisma.user.deleteMany({
+						where: {
+							id: gameroom.id
+						}
+					});
 					await prisma.gameroom.delete({
 						where:{
 							id: gameroom.id
