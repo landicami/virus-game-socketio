@@ -127,40 +127,6 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
   console.log("Now the game will start, with the", gameroom);
   console.log(`Virus will appear in div${virusShow} within ${virusInterval} seconds`);
   setupGameView(gameroom.users);
-  // function getDivandPutvirus(virusShow: number, virusInterval: number) {
-  //   const divID = "div" + virusShow;
-  //   const divElement = document.getElementById(divID) as HTMLDivElement;
-
-  //   if (divElement) {
-  //     setTimeout(function () {
-  //       divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
-  //       console.log(divElement);
-  //       startTimer();
-  //       startstopWatch();
-  //     }, virusInterval);
-  //     function handleClick() {
-  //       stopStopwatch();
-  //       divElement.innerHTML = "";
-  //       virusPressed = virusClicked();
-  //       let userId = socket.id;
-
-  //       if (!userId) {
-  //         return;
-  //       }
-  //       socket.emit("virusClick", userId, gameroom, virusPressed)
-  //       divElement.removeEventListener("click", handleClick)
-  //     }
-  //     divElement.addEventListener("click", handleClick);
-
-  //   } else {
-  //     console.log("Kunde inte hitta element med ID: " + divID);
-  //   }
-  // }
-  // getDivandPutvirus(virusShow, virusInterval);
-
-  /**
-   * TEST
-   */
 
   function getDivandPutvirus(virusShow: number, virusInterval: number) {
     const divID = "div" + virusShow;
@@ -214,10 +180,6 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
 
   getDivandPutvirus(virusShow, virusInterval);
 
-
-  /**
-   * TESTEND
-   */
   // } else {
   //   waitingDiv.classList.remove("hide");
   // }
@@ -263,43 +225,6 @@ socket.on("latestReactiontime", (usersInRoom, gameroomId) => {
 
 socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
   console.log(gameroom);
-  // function getDivandPutvirus(virusShow: number, virusInterval: number) {
-  //   const divID = "div" + virusShow;
-  //   const divElement = document.getElementById(divID) as HTMLDivElement;
-
-  //   if (divElement) {
-  //     setTimeout(function () {
-  //       divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
-  //       console.log(divElement);
-  //       startTimer();
-  //       startstopWatch();
-  //     }, virusInterval);
-
-  //     function handleClick() {
-  //       stopStopwatch();
-  //       divElement.innerHTML = "";
-  //       virusPressed = virusClicked();
-  //       let userId = socket.id;
-
-  //       if (!userId) {
-  //         return;
-  //       }
-  //       socket.emit("virusClick", userId, gameroom, virusPressed)
-  //       divElement.removeEventListener("click", handleClick)
-  //     }
-
-  //     divElement.addEventListener("click", handleClick);
-  //   } else {
-  //     console.log("Kunde inte hitta element med ID: " + divID);
-  //   }
-  // }
-  // getDivandPutvirus(virusShow, virusInterval);
-  // currentRound++;
-  // console.log("Det här är rundan", currentRound);
-
-  /**
-   * TEST
-   */
 
   function getDivandPutvirus(virusShow: number, virusInterval: number) {
     const divID = "div" + virusShow;
@@ -353,9 +278,6 @@ socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
 
   getDivandPutvirus(virusShow, virusInterval);
 
-  /**
-   * TESTEND
-   */
   // resetTimer();
 })
 socket.on("gameOver", () => {
