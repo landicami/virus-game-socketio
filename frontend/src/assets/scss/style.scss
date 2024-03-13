@@ -62,16 +62,13 @@ ul {
   height: 30rem;
 }
 
-.knife{
-  cursor: pointer;
-}
-
 .rowgame {
   height: 4rem;
 }
 
 #virusEmoji {
   font-size: 3rem;
+  cursor: pointer;
 }
 
 p {
@@ -84,7 +81,7 @@ p {
 }
 
 .playerTwo {
-  color: darkmagenta;
+  color: green;
   font-size: x-large;
 
 }
@@ -94,9 +91,17 @@ background-color: rgba(85, 107, 47, 0.5);
 border-radius: 50%;
 margin: auto;
 text-align: center;
-height: 30vh;
+height: 40vh;
 }
 
 #winnerOrLoser {
 margin-top: 2rem;
+}
+
+.winner {
+  font-size: x-large;
+}
+
+#tie {
+  font-size: x-large;
 }

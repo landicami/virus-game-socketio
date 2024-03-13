@@ -250,6 +250,18 @@ socket.on("gameOver", (usersInRoom) => {
   gameOverDiv.classList.remove("hide");
   winnerOrLoser.innerText = `Game is over!`;
   nextRound.innerText = `The result was: ${userOneResult.username}: ${userOneResult.score} - ${userTwoResult.username}: ${userTwoResult.score}.`;
+   // Om det finns minst två spelare
+  
+
+    // Jämför spelarnas poäng och bestäm vem som vann
+    if (userOneResult.score! > userTwoResult.score!) {
+      nextRound.innerHTML += `<br><p class="winner">${userOneResult.username} won! <span>&#128526;</span></p>`;
+    } else if (userOneResult.score! < userTwoResult.score!) {
+      nextRound.innerHTML += `<br><p class="winner">${userTwoResult.username} won! <span>&#128526;</span></p>`;
+    } else {
+      nextRound.innerHTML += `<br><p id="tie">It's a tie! <span>&#128540;</span></p>`;
+    }
+  
   replayGameForm.addEventListener("submit",()=>{
   })
     
