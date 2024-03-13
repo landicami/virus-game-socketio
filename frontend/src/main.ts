@@ -152,6 +152,7 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
               return;
             }
             socket.emit("virusClick", userId, gameroom, defaultVirusPressed);
+            divElement.removeEventListener("click", handleClick);
           }
         }, 15000); // 15 seconds
 
@@ -250,6 +251,7 @@ socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
               return;
             }
             socket.emit("virusClick", userId, gameroom, defaultVirusPressed);
+            divElement.removeEventListener("click", handleClick);
           }
         }, 15000); // 15 seconds
 
