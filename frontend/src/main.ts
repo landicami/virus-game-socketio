@@ -38,8 +38,8 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
 let username: string = "";
 let startTime: number;
 let virusPressed: number;
-let currentRound = 0;
-let currentRoomId: string = "";
+// let currentRound = 0;
+// let currentRoomId: string = "";
 let playerOneRoundCount = 0;
 let playerTwoRoundCount = 0;
 
@@ -219,7 +219,7 @@ socket.on("latestReactiontime", (usersInRoom, gameroomId) => {
     resetTimer();
   }, 1500);
   // socket.emit("continueGame", usersInRoom, gameroomId);
-  console.log("EMITTAS DENNA???");
+  console.log("EMITTAS DENNA???", gameroomId);
 });
 
 
