@@ -225,7 +225,7 @@ export const handleConnection = (
 			// if (user1.virusClicked && user2.virusClicked) {
 			// Jämför rounds och tilldela poäng
 			if (user1.virusClicked < user2.virusClicked) {
-				io.to(gameroom.id).emit("roundWinner", user1)
+
 				debug(`User 1 ${user1.username} får ett poäng.`);
 				user1count++;
 				await prisma.user.update({
@@ -236,8 +236,9 @@ export const handleConnection = (
 						score: user1count
 					}
 				});
+				io.to(gameroom.id).emit("roundWinner", user1)
 			} else {
-				io.to(gameroom.id).emit("roundWinner", user2)
+
 				debug(` User 2 ${user2.username} får ett poäng.`);
 				user2count++;
 				await prisma.user.update({
@@ -247,6 +248,7 @@ export const handleConnection = (
 					data:{
 						score: user2count
 					}});
+					io.to(gameroom.id).emit("roundWinner", user2)
 			}
 			debug("USer1 score", user1count);
 			debug("USer2 score", user2count);
@@ -278,29 +280,30 @@ export const handleConnection = (
 		};
 
 
+			currentRoundinRoom++;
 
-			// currentRoundinRoom++;
-
-			// const findRoomAndUpdateRounds = await prisma.gameroom.update({
-			// 	where: {
-			// 		id: usersInRoom.
-			// 	},
-			// 	data: {
-			// 		currentRound: currentRoundinRoom
-			// 	},
-			// });
-
+            const findRoomAndUpdateRounds = await prisma.gameroom.update({
+                where: {
+                    id: gameroom.id
+                },
+                data: {
+                    currentRound: currentRoundinRoom
+                },
+            });
 
 			// if(userOneWithTenClick.averageTime.length ===10 && userTwoWithTenClick.averageTime.length === 10){
 
 
 				//emitta gamestop
 			// }
-
+			if(!findRoomAndUpdateRounds.currentRound){
+				debug("Room not found");
+				return;
+			}
 			const userOneWithTenClick = usersInRoom[0];
 			const userTwoWithTenClick= usersInRoom[1];
-			if(userOneWithTenClick.averageTime.length !==10 && userTwoWithTenClick.averageTime.length !== 10){
-				io.to(gameroom.id).emit("nextRound", gameroom, randomNumber(), randomInterval);
+			if(findRoomAndUpdateRounds.currentRound < 10){
+				io.to(gameroom.id).emit("nextRound", gameroom, randomNumber(), randomInterval); //If(round=11){dont();}
 				debug("ÄR KLICK MINDRE ÄN 10?");
 			}else{
 				function averageClickTime1(){
@@ -359,17 +362,56 @@ export const handleConnection = (
 					findingHighscores();
 					findingLastPlayedGames();
 
+
+
+					// const usersInRoomToDelete = await prisma.user.findMany({
+					// 	where: {
+					// 		roomId: gameroom.id
+					// 	}
+					// });
+
+					// const userIdtoDelete = usersInRoomToDelete.map(user => user.id);
+
+					// Ta bort alla användare i rummet
+					// for (const user of usersInRoomToDelete) {
+						await prisma.user.deleteMany({
+							 where: {
+								roomId: gameroom.id
+							 }
+						});
+					// }
+
+					// Ta bort det specifika rummet
+
+					async function endGame(roomId){
+						try{
+							const room = await prisma.gameroom.findUnique({
+								where: {
+									id: roomId
+								}
+							});
+
+							if(room){
+								await prisma.gameroom.delete({where:{id: roomId}});
+								for (const user of gameroom.users){
+									await prisma.user.delete({where:{id:userId}})
+								}
+							}else{
+								debug("Room not found");
+							}
+						}catch(error){
+							console.error("error ending game");
+						}
+					};
+
+					// await prisma.gameroom.delete({
+					// 	where: {
+					// 		id: gameroom.id
+					// 	}
+					// });
+					endGame(gameroom.id)
+
 					io.to(gameroom.id).emit("gameOver", usersInRoom);
-					await prisma.user.deleteMany({
-						where: {
-							id: gameroom.id
-						}
-					});
-					await prisma.gameroom.delete({
-						where:{
-							id: gameroom.id
-						}
-					})
 			}
 
 
