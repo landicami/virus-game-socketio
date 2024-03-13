@@ -404,7 +404,7 @@ export const handleConnection = (
 						}
 					};
 
-					io.to(gameroom.id).emit("gameOver", usersInRoom);
+					io.to(gameroom.id).emit("gameOver", endGameUsers);
 			}
 
 
