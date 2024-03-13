@@ -73,6 +73,8 @@ socket.on("connect", () => {
 // Listen for when server got tired of us
 socket.on("disconnect", () => {
   console.log("💀 Disconnected from the server:", SOCKET_HOST);
+  alert("A player disconnected from the server, reload page")
+  window.location.reload();
 });
 
 // Listen for when we're reconnected (either due to our or the servers connection)
@@ -125,22 +127,35 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
   console.log("Now the game will start, with the", gameroom);
   console.log(`Virus will appear in div${virusShow} within ${virusInterval} seconds`);
   setupGameView(gameroom.users);
-  // if(gameroom.users.length === 2){
-  // startDiv.classList.add("hide");
-  // waitingDiv.classList.add("hide");
-  // gameDiv.classList.remove("hide");
-  // highscoreDiv.classList.add("hide");
-
-  currentRound = gameroom.currentRound as number;
-  // if (gameroom.currentRound !== undefined) {
-  //   currentRound = gameroom.currentRound; 
-  // } else {
-  //   currentRound = 0; 
-  // }
-  // document.getElementById('round-display')!.innerText = `Round: ${currentRound}`;
-
-  currentRoomId = gameroom.id;
-  // const players = gameroom.users;
+  function getDivandPutvirus(virusShow: number, virusInterval: number) {
+    const divID = "div" + virusShow;
+    const divElement = document.getElementById(divID) as HTMLDivElement;
+  
+    if (divElement) {
+      setTimeout(function () {
+        divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+        console.log(divElement);
+        startTimer();
+        startstopWatch();
+      }, virusInterval);
+  
+        divElement.addEventListener("click", () => {
+          stopStopwatch();
+          divElement.innerHTML = "";
+          virusPressed = virusClicked();
+          let userId = socket.id;
+  
+          if (!userId) {
+            return;
+          }
+          socket.emit("virusClick", userId, gameroom, virusPressed);
+         
+        });
+     
+    } else {
+      console.log("Kunde inte hitta element med ID: " + divID);
+    }
+  }
   getDivandPutvirus(virusShow, virusInterval);
   // } else {
   //   waitingDiv.classList.remove("hide");
@@ -148,53 +163,74 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
 
 });
 
-socket.on("roundWinner", (usersInRoom) => {
-  const userswithResult = usersInRoom;
-  console.log(userswithResult);
+socket.on("roundWinner", (userInRoom) => {
+  const userwithResult = userInRoom;
+  console.log(userwithResult);
 
   //Sätt ut rundans vinnare i DOM
-  if (usersInRoom.username === playerOneParagraph.innerText) {
+  if (userInRoom.username === playerOneParagraph.innerText) {
     playerOneRoundCount++;
     console.log("username1", username);
     playerOneResult.innerText = `${playerOneRoundCount}`;
-
 
   } else {
     playerTwoRoundCount++;
     console.log("username2:", username);
     playerTwoResult.innerText = `${playerTwoRoundCount}`;
-
-
   }
-
 });
 
-socket.on("latestReactiontime", (usersInRoom) => {
+socket.on("latestReactiontime", (usersInRoom, gameroomId) => {
   if (usersInRoom[0].virusClicked) {
-
     let virusClickedInSeconds1: string = (usersInRoom[0].virusClicked / 1000).toFixed(3);
     playerOneLatestTime.textContent = virusClickedInSeconds1;
     console.log("Playerone latest time", virusClickedInSeconds1)
   }
-
   if (usersInRoom[1].virusClicked) {
     let virusClickedInSeconds2: string = (usersInRoom[1].virusClicked / 1000).toFixed(3);
     playerTwoLatestTime.textContent = virusClickedInSeconds2;
     console.log("Playertwo latest time", virusClickedInSeconds2)
-
   }
-
-
   setTimeout(() => {
+   // display.innerHTML = "00:000";
     resetTimer();
-    // playerOneLatestTime.textContent = "00:00:00"
-    // playerTwoLatestTime.textContent = "00:00:00"
-
-  }, 3000);
+  }, 1500);
+ // socket.emit("continueGame", usersInRoom, gameroomId);
+  console.log("EMITTAS DENNA???");
 });
 
-socket.on("nextRound", (roomId, virusShow, virusInterval) => {
-  console.log(roomId);
+
+socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
+  console.log(gameroom);
+  function getDivandPutvirus(virusShow: number, virusInterval: number) {
+    const divID = "div" + virusShow;
+    const divElement = document.getElementById(divID) as HTMLDivElement;
+  
+    if (divElement) {
+      setTimeout(function () {
+        divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+        console.log(divElement);
+        startTimer();
+        startstopWatch();
+      }, virusInterval);
+  
+        divElement.addEventListener("click", () => {
+          stopStopwatch();
+          divElement.innerHTML = "";
+          virusPressed = virusClicked();
+          let userId = socket.id;
+  
+          if (!userId) {
+            return;
+          }
+          socket.emit("virusClick", userId, gameroom, virusPressed);
+         
+        });
+     
+    } else {
+      console.log("Kunde inte hitta element med ID: " + divID);
+    }
+  }
   getDivandPutvirus(virusShow, virusInterval);
   currentRound++;
   console.log("Det här är rundan", currentRound);
@@ -237,28 +273,27 @@ function stopStopwatch() {
 
 
 function runStopwatch() {
-  milliseconds++;
-  if (milliseconds === 100) {
-    milliseconds = 0;
-    seconds++;
-  }
-  // const elapsedTime = Date.now() - startTime;  // 2337 ms
-  // const seconds = Math.floor(elapsedTime / 1000);  // 2
-  // const milliseconds = elapsedTime - (seconds * 1000);   // 2337 - 2000 = 337
+  // milliseconds++;
+  // if (milliseconds === 100) {
+  //   milliseconds = 0;
+  //   seconds++;
+  // }
+  const elapsedTime = Date.now() - startTime;  // 2337 ms
+  seconds = Math.floor(elapsedTime / 1000);  // 2
+  milliseconds = elapsedTime - (seconds * 1000);   // 2337 - 2000 = 337
 
   display.innerHTML =
     (seconds < 10 ? '0' + seconds : seconds) + '.' +
     (milliseconds < 10 ? '00' + milliseconds : milliseconds < 100 ? '0' + milliseconds : milliseconds);
 }
 
-function resetTimer() {
-  clearInterval(timer);
-  isRunning = false;
-  milliseconds = 0;
-  seconds = 0;
-  display.innerHTML = '00:00:00';
-}
-// console.log(resetTimer()); //använd senare
+ function resetTimer() {
+   clearInterval(timer);
+   isRunning = false;
+   milliseconds = 0;
+   seconds = 0;
+   display.innerHTML = '00:00:00';
+ }
 
 function setupGameView(users: string[]) {
   startDiv.classList.add("hide");
@@ -271,46 +306,4 @@ function setupGameView(users: string[]) {
   playerTwoParagraph.innerText = playerTwo;
 }
 
-function getDivandPutvirus(virusShow: number, virusInterval: number) {
-  const divID = "div" + virusShow;
-  const divElement = document.getElementById(divID) as HTMLDivElement;
 
-  if (divElement) {
-    setTimeout(function () {
-      divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
-      console.log(divElement);
-      startTimer();
-      startstopWatch();
-      divElement.addEventListener("click", () => {
-        stopStopwatch();
-        divElement.innerHTML = "";
-        virusPressed = virusClicked();
-        let userId = socket.id;
-
-        if (!userId) {
-          return;
-        }
-        // virusClicked();
-        socket.emit("virusClick", userId, currentRoomId, username, virusPressed);
-        // // round logic
-        // console.log(currentRound);
-        // currentRound++; 
-        // console.log(currentRound);
-        // document.getElementById('round-display')!.innerText = `Round: ${currentRound}`; 
-
-        // if (currentRound >= 10) {
-        //   console.log("Game Over! All 10 rounds complete.");
-        //   socket.emit("gameOver" as any, currentRoomId); 
-        // } else {
-        //   console.log("Emitting 'nextRound' with socket ID:", socket.id)
-        //   console.log(currentRoomId);
-        //   socket.emit("nextRound", currentRoomId, currentRound);
-        //   console.log(currentRoomId);
-        //   console.log("Sent 'nextRound' event");  
-        // }
-      });
-    }, virusInterval);
-  } else {
-    console.log("Kunde inte hitta element med ID: " + divID);
-  }
-}

@@ -8,9 +8,8 @@ datasource db {
 }
 
 model Gameroom {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
   users        User[]
-  playedgames  PlayedGames[]
   currentRound Int?
 }
 
@@ -39,8 +38,6 @@ model PlayedGames {
   userTwo      String
   userOneScore Int?
   userTwoScore Int?
-  Gameroom     Gameroom? @relation(fields: [gameroomId], references: [id])
-  gameroomId   String?   @db.ObjectId
 }
 
 // Not complete, may have to change. This is just a example on highscore for now
