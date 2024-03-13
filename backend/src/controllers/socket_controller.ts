@@ -361,29 +361,11 @@ export const handleConnection = (
 					debug("VI vill inte fortsätta med någonting");
 					findingHighscores();
 					findingLastPlayedGames();
+					endGame(gameroom.id)
 
+					// Ta bort det specifika rummet och användare
 
-
-					// const usersInRoomToDelete = await prisma.user.findMany({
-					// 	where: {
-					// 		roomId: gameroom.id
-					// 	}
-					// });
-
-					// const userIdtoDelete = usersInRoomToDelete.map(user => user.id);
-
-					// Ta bort alla användare i rummet
-					// for (const user of usersInRoomToDelete) {
-						await prisma.user.deleteMany({
-							 where: {
-								roomId: gameroom.id
-							 }
-						});
-					// }
-
-					// Ta bort det specifika rummet
-
-					async function endGame(roomId){
+					async function endGame(roomId: string){
 						try{
 							const room = await prisma.gameroom.findUnique({
 								where: {
@@ -403,13 +385,6 @@ export const handleConnection = (
 							console.error("error ending game");
 						}
 					};
-
-					// await prisma.gameroom.delete({
-					// 	where: {
-					// 		id: gameroom.id
-					// 	}
-					// });
-					endGame(gameroom.id)
 
 					io.to(gameroom.id).emit("gameOver", usersInRoom);
 			}
