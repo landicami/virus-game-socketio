@@ -1,7 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import {
   ClientToServerEvents,
-  // RoomInfo,
   ServerToClientEvents,
 } from "@shared/types/SocketTypes";
 import "./assets/scss/style.scss";
@@ -38,8 +37,6 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
 let username: string = "";
 let startTime: number;
 let virusPressed: number;
-// let currentRound = 0;
-// let currentRoomId: string = "";
 let playerOneRoundCount = 0;
 let playerTwoRoundCount = 0;
 
@@ -52,7 +49,6 @@ const startTimer = () => {
   startTime = Date.now();
   console.log(startTime);
   return startTime;
-  // return (startTime = Date.now());
 };
 const virusClicked = () => {
   const endTime = Date.now();
@@ -139,14 +135,12 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
         startTimer();
         startstopWatch();
 
-        // Timeout for automatic default click
         let clickTimeout = setTimeout(() => {
           handleClick();
-        }, 15000); // 15 seconds
+        }, 15000);
 
-        // User Click Handler
         function handleClick() {
-          clearTimeout(clickTimeout); // Clear timeout if the user reacts in time
+          clearTimeout(clickTimeout);
           stopStopwatch();
           divElement.innerHTML = "";
           virusPressed = virusClicked();
@@ -168,10 +162,6 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
   }
 
   getDivandPutvirus(virusShow, virusInterval);
-
-  // } else {
-  //   waitingDiv.classList.remove("hide");
-  // }
 
 });
 
@@ -204,10 +194,8 @@ socket.on("latestReactiontime", (usersInRoom, gameroomId) => {
     console.log("Playertwo latest time", virusClickedInSeconds2)
   }
   setTimeout(() => {
-    // display.innerHTML = "00:000";
     resetTimer();
   }, 1500);
-  // socket.emit("continueGame", usersInRoom, gameroomId);
   console.log("EMITTAS DENNA???", gameroomId);
 });
 
@@ -226,14 +214,12 @@ socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
         startTimer();
         startstopWatch();
 
-        // Timeout for automatic default click
         let clickTimeout = setTimeout(() => {
           handleClick();
-        }, 15000); // 15 seconds
+        }, 15000);
 
-        // User Click Handler
         function handleClick() {
-          clearTimeout(clickTimeout); // Clear timeout if the user reacts in time
+          clearTimeout(clickTimeout);
           stopStopwatch();
           divElement.innerHTML = "";
           virusPressed = virusClicked();
@@ -266,13 +252,7 @@ socket.on("gameOver", (usersInRoom) => {
   gameOverDiv.classList.remove("hide");
   winnerOrLoser.innerText = `Game is over!`;
   nextRound.innerText = `The result was: ${userOneResult.username}: ${userOneResult.score} - ${userTwoResult.username}: ${userTwoResult.score}`;
-
-  // alert("Game Over! Fuck you");
 });
-
-
-
-//stopwatch
 
 let timer = 0;
 let isRunning = false;
@@ -297,14 +277,9 @@ function stopStopwatch() {
 
 
 function runStopwatch() {
-  // milliseconds++;
-  // if (milliseconds === 100) {
-  //   milliseconds = 0;
-  //   seconds++;
-  // }
-  const elapsedTime = Date.now() - startTime;  // 2337 ms
-  seconds = Math.floor(elapsedTime / 1000);  // 2
-  milliseconds = elapsedTime - (seconds * 1000);   // 2337 - 2000 = 337
+  const elapsedTime = Date.now() - startTime;
+  seconds = Math.floor(elapsedTime / 1000);
+  milliseconds = elapsedTime - (seconds * 1000);
 
   display.innerHTML =
     (seconds < 10 ? '0' + seconds : seconds) + '.' +
