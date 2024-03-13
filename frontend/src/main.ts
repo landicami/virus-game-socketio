@@ -1,8 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import {
-  ClientToServerEvents,
-  ServerToClientEvents,
-} from "@shared/types/SocketTypes";
+import { ClientToServerEvents, ServerToClientEvents } from "@shared/types/SocketTypes";
 import "./assets/scss/style.scss";
 
 const SOCKET_HOST = import.meta.env.VITE_SOCKET_HOST;
@@ -14,7 +11,6 @@ const startDiv = document.querySelector("#start") as HTMLDivElement;
 const gameDiv = document.querySelector("#game") as HTMLDivElement;
 const waitingDiv = document.querySelector(".waiting") as HTMLDivElement;
 const highscoreDiv = document.querySelector(".highscoreDiv") as HTMLDivElement;
-const replayGameButton = document.querySelector("#replayBtn") as HTMLButtonElement;
 const replayGameForm = document.querySelector("#replay") as HTMLFormElement;
 
 const playerOneParagraph = document.querySelector(".playerOne") as HTMLParagraphElement;

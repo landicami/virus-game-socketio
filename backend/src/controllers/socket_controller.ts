@@ -3,7 +3,7 @@
  */
 import Debug from "debug";
 import { Server, Socket } from "socket.io";
-import { ClientToServerEvents, GameRoomInterface, ServerToClientEvents, playedGamesUser} from "@shared/types/SocketTypes";
+import { ClientToServerEvents, GameRoomInterface, ServerToClientEvents, PlayedGamesUser} from "@shared/types/SocketTypes";
 import prisma from "../prisma";
 
 // Create a new debug instance
@@ -48,7 +48,7 @@ export const handleConnection = (
 			},
 			take: 5,
 		});
-		const playedGamesData: playedGamesUser[] = allPlayedGames.map(game => ({
+		const playedGamesData: PlayedGamesUser[] = allPlayedGames.map(game => ({
 			id: game.id,
 			createdAt: game.createdAt,
 			userOne: game.userOne,

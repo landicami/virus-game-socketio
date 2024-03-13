@@ -9,8 +9,8 @@ export interface ServerToClientEvents {
   gameOver: (usersInRoom: UserInroom[]) => void;
   roundWinner: (userInRoom: UserInroom) => void;
   latestReactiontime: (usersInRoom: UserInroom[], roomId: string) => void;
-  highscore: (creatingHighscore: highscoreFromUser[]) => void;
-  playedGames: (creatingPlayedGames: playedGamesUser[]) => void;
+  highscore: (creatingHighscore: HighscoreFromUser[]) => void;
+  playedGames: (creatingPlayedGames: PlayedGamesUser[]) => void;
 }
 
 // Events emitted by the client to the server
@@ -45,13 +45,13 @@ export interface UserInroom {
   higscoresId: string | null; // Fixa stavfel här, ändrade från "higscoresId" till "highscoresId"
 }
 
-export interface highscoreFromUser {
+export interface HighscoreFromUser {
   id: string
   username: string
   averageTimeFromUser: number
 }
 
-export interface playedGamesUser {
+export interface PlayedGamesUser {
   id: string
   createdAt: Date | null
   userOne:string
