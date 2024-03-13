@@ -141,19 +141,7 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
 
         // Timeout for automatic default click
         let clickTimeout = setTimeout(() => {
-          if (divElement.innerHTML !== "") { // Check if virus is still visible 
-            console.log("Auto-default after 15 seconds");
-            stopStopwatch();
-            divElement.innerHTML = "";
-            let defaultVirusPressed = 15000;  // 15 seconds in milliseconds
-
-            let userId = socket.id;
-            if (!userId) {
-              return;
-            }
-            socket.emit("virusClick", userId, gameroom, defaultVirusPressed);
-            divElement.removeEventListener("click", handleClick);
-          }
+          handleClick();
         }, 15000); // 15 seconds
 
         // User Click Handler
@@ -240,19 +228,7 @@ socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
 
         // Timeout for automatic default click
         let clickTimeout = setTimeout(() => {
-          if (divElement.innerHTML !== "") { // Check if virus is still visible 
-            console.log("Auto-default after 15 seconds");
-            stopStopwatch();
-            divElement.innerHTML = "";
-            let defaultVirusPressed = 15000;  // 15 seconds in milliseconds
-
-            let userId = socket.id;
-            if (!userId) {
-              return;
-            }
-            socket.emit("virusClick", userId, gameroom, defaultVirusPressed);
-            divElement.removeEventListener("click", handleClick);
-          }
+          handleClick();
         }, 15000); // 15 seconds
 
         // User Click Handler
