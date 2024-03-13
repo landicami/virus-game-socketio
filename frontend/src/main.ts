@@ -127,6 +127,41 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
   console.log("Now the game will start, with the", gameroom);
   console.log(`Virus will appear in div${virusShow} within ${virusInterval} seconds`);
   setupGameView(gameroom.users);
+  // function getDivandPutvirus(virusShow: number, virusInterval: number) {
+  //   const divID = "div" + virusShow;
+  //   const divElement = document.getElementById(divID) as HTMLDivElement;
+
+  //   if (divElement) {
+  //     setTimeout(function () {
+  //       divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+  //       console.log(divElement);
+  //       startTimer();
+  //       startstopWatch();
+  //     }, virusInterval);
+  //     function handleClick() {
+  //       stopStopwatch();
+  //       divElement.innerHTML = "";
+  //       virusPressed = virusClicked();
+  //       let userId = socket.id;
+
+  //       if (!userId) {
+  //         return;
+  //       }
+  //       socket.emit("virusClick", userId, gameroom, virusPressed)
+  //       divElement.removeEventListener("click", handleClick)
+  //     }
+  //     divElement.addEventListener("click", handleClick);
+
+  //   } else {
+  //     console.log("Kunde inte hitta element med ID: " + divID);
+  //   }
+  // }
+  // getDivandPutvirus(virusShow, virusInterval);
+
+  /**
+   * TEST
+   */
+
   function getDivandPutvirus(virusShow: number, virusInterval: number) {
     const divID = "div" + virusShow;
     const divElement = document.getElementById(divID) as HTMLDivElement;
@@ -137,26 +172,52 @@ socket.on("gameStart", (gameroom, virusShow, virusInterval) => {
         console.log(divElement);
         startTimer();
         startstopWatch();
-      }, virusInterval);
-      function handleClick() {
-        stopStopwatch();
-        divElement.innerHTML = "";
-        virusPressed = virusClicked();
-        let userId = socket.id;
 
-        if (!userId) {
-          return;
+        // Timeout for automatic default click
+        let clickTimeout = setTimeout(() => {
+          if (divElement.innerHTML !== "") { // Check if virus is still visible 
+            console.log("Auto-default after 15 seconds");
+            stopStopwatch();
+            divElement.innerHTML = "";
+            let defaultVirusPressed = 15000;  // 15 seconds in milliseconds
+
+            let userId = socket.id;
+            if (!userId) {
+              return;
+            }
+            socket.emit("virusClick", userId, gameroom, defaultVirusPressed);
+          }
+        }, 15000); // 15 seconds
+
+        // User Click Handler
+        function handleClick() {
+          clearTimeout(clickTimeout); // Clear timeout if the user reacts in time
+          stopStopwatch();
+          divElement.innerHTML = "";
+          virusPressed = virusClicked();
+          let userId = socket.id;
+
+          if (!userId) {
+            return;
+          }
+          socket.emit("virusClick", userId, gameroom, virusPressed)
+          divElement.removeEventListener("click", handleClick);
         }
-        socket.emit("virusClick", userId, gameroom, virusPressed)
-        divElement.removeEventListener("click", handleClick)
-      }
-      divElement.addEventListener("click", handleClick);
 
+        divElement.addEventListener("click", handleClick);
+
+      }, virusInterval);
     } else {
       console.log("Kunde inte hitta element med ID: " + divID);
     }
   }
+
   getDivandPutvirus(virusShow, virusInterval);
+
+
+  /**
+   * TESTEND
+   */
   // } else {
   //   waitingDiv.classList.remove("hide");
   // }
@@ -202,6 +263,44 @@ socket.on("latestReactiontime", (usersInRoom, gameroomId) => {
 
 socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
   console.log(gameroom);
+  // function getDivandPutvirus(virusShow: number, virusInterval: number) {
+  //   const divID = "div" + virusShow;
+  //   const divElement = document.getElementById(divID) as HTMLDivElement;
+
+  //   if (divElement) {
+  //     setTimeout(function () {
+  //       divElement.innerHTML = `<span id="virusEmoji">&#129503;</span>`;
+  //       console.log(divElement);
+  //       startTimer();
+  //       startstopWatch();
+  //     }, virusInterval);
+
+  //     function handleClick() {
+  //       stopStopwatch();
+  //       divElement.innerHTML = "";
+  //       virusPressed = virusClicked();
+  //       let userId = socket.id;
+
+  //       if (!userId) {
+  //         return;
+  //       }
+  //       socket.emit("virusClick", userId, gameroom, virusPressed)
+  //       divElement.removeEventListener("click", handleClick)
+  //     }
+
+  //     divElement.addEventListener("click", handleClick);
+  //   } else {
+  //     console.log("Kunde inte hitta element med ID: " + divID);
+  //   }
+  // }
+  // getDivandPutvirus(virusShow, virusInterval);
+  // currentRound++;
+  // console.log("Det här är rundan", currentRound);
+
+  /**
+   * TEST
+   */
+
   function getDivandPutvirus(virusShow: number, virusInterval: number) {
     const divID = "div" + virusShow;
     const divElement = document.getElementById(divID) as HTMLDivElement;
@@ -212,29 +311,51 @@ socket.on("nextRound", (gameroom, virusShow, virusInterval) => {
         console.log(divElement);
         startTimer();
         startstopWatch();
-      }, virusInterval);
 
-      function handleClick() {
-        stopStopwatch();
-        divElement.innerHTML = "";
-        virusPressed = virusClicked();
-        let userId = socket.id;
+        // Timeout for automatic default click
+        let clickTimeout = setTimeout(() => {
+          if (divElement.innerHTML !== "") { // Check if virus is still visible 
+            console.log("Auto-default after 15 seconds");
+            stopStopwatch();
+            divElement.innerHTML = "";
+            let defaultVirusPressed = 15000;  // 15 seconds in milliseconds
 
-        if (!userId) {
-          return;
+            let userId = socket.id;
+            if (!userId) {
+              return;
+            }
+            socket.emit("virusClick", userId, gameroom, defaultVirusPressed);
+          }
+        }, 15000); // 15 seconds
+
+        // User Click Handler
+        function handleClick() {
+          clearTimeout(clickTimeout); // Clear timeout if the user reacts in time
+          stopStopwatch();
+          divElement.innerHTML = "";
+          virusPressed = virusClicked();
+          let userId = socket.id;
+
+          if (!userId) {
+            return;
+          }
+          socket.emit("virusClick", userId, gameroom, virusPressed)
+          divElement.removeEventListener("click", handleClick);
         }
-        socket.emit("virusClick", userId, gameroom, virusPressed)
-        divElement.removeEventListener("click", handleClick)
-      }
 
-      divElement.addEventListener("click", handleClick);
+        divElement.addEventListener("click", handleClick);
+
+      }, virusInterval);
     } else {
       console.log("Kunde inte hitta element med ID: " + divID);
     }
   }
+
   getDivandPutvirus(virusShow, virusInterval);
-  currentRound++;
-  console.log("Det här är rundan", currentRound);
+
+  /**
+   * TESTEND
+   */
   // resetTimer();
 })
 socket.on("gameOver", () => {
