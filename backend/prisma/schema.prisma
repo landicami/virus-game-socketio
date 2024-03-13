@@ -39,11 +39,3 @@ model PlayedGames {
   userOneScore Int?
   userTwoScore Int?
 }
-
-// Not complete, may have to change. This is just a example on highscore for now
-// model Highscore {
-//   id        String @id @default(auto()) @map("_id") @db.ObjectId
-//   time      Int[]
-//   user      User @relation(fields: [userId], references: [id] )
-//   userId    String 
-// }
