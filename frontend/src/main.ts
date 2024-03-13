@@ -14,6 +14,8 @@ const startDiv = document.querySelector("#start") as HTMLDivElement;
 const gameDiv = document.querySelector("#game") as HTMLDivElement;
 const waitingDiv = document.querySelector(".waiting") as HTMLDivElement;
 const highscoreDiv = document.querySelector(".highscoreDiv") as HTMLDivElement;
+const replayGameButton = document.querySelector("#replayBtn") as HTMLButtonElement;
+const replayGameForm = document.querySelector("#replay") as HTMLFormElement;
 
 const playerOneParagraph = document.querySelector(".playerOne") as HTMLParagraphElement;
 const playerTwoParagraph = document.querySelector(".playerTwo") as HTMLParagraphElement;
@@ -251,7 +253,10 @@ socket.on("gameOver", (usersInRoom) => {
   gameDiv.classList.add("hide");
   gameOverDiv.classList.remove("hide");
   winnerOrLoser.innerText = `Game is over!`;
-  nextRound.innerText = `The result was: ${userOneResult.username}: ${userOneResult.score} - ${userTwoResult.username}: ${userTwoResult.score}`;
+  nextRound.innerText = `The result was: ${userOneResult.username}: ${userOneResult.score} - ${userTwoResult.username}: ${userTwoResult.score}.`;
+  replayGameForm.addEventListener("submit",()=>{
+  })
+    
 });
 
 let timer = 0;
@@ -291,7 +296,7 @@ function resetTimer() {
   isRunning = false;
   milliseconds = 0;
   seconds = 0;
-  display.innerHTML = '00:00:00';
+  display.innerHTML = '00:000';
 }
 
 function setupGameView(users: string[]) {

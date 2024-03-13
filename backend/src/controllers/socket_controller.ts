@@ -3,46 +3,15 @@
  */
 import Debug from "debug";
 import { Server, Socket } from "socket.io";
-import {
-	ClientToServerEvents,
-	GameRoomInterface,
-	ServerToClientEvents,
-	playedGamesUser,
-} from "@shared/types/SocketTypes";
+import { ClientToServerEvents, GameRoomInterface, ServerToClientEvents, playedGamesUser} from "@shared/types/SocketTypes";
 import prisma from "../prisma";
 
 // Create a new debug instance
 const debug = Debug("backend:socket_controller");
 
-interface Round {
-	[key: string]: number;
-}
-
-interface RoomsInterface {
-	[key: string]: {
-		rounds: Round[];
-	};
-}
-
-const rooms: RoomsInterface = {};
-
-const a = ['a', 'b', 'c'];
-a.length; // 3
-
-function getRound(rounds: Round[]): number | null {
-	if (rounds.length === 0) {
-		return null;
-	}
-
-	const lastRoundNumber = rounds.length - 1; // 2
-
-	if (Object.keys(rounds[lastRoundNumber]).length === 2) {
-		return null;
-	}
-	return lastRoundNumber;
-}
 
 let activeGameRooms: GameRoomInterface[] = [];
+
 function randomNumber() {
 	return Math.floor(Math.random() * 25) + 1;
 }
