@@ -358,11 +358,19 @@ export const handleConnection = (
 					debug("VI vill inte fortsätta med någonting");
 					findingHighscores();
 					findingLastPlayedGames();
+					await prisma.user.deleteMany({});
 					io.to(gameroom.id).emit("gameOver", gameroom.id);
+					await prisma.gameroom.delete({
+						where:{
+							id: gameroom.id
+						}
+					})
 			}
 
 
 		 });
+
+
 
 		 socket.on("continueGame", async (usersInRoom, gameroomId) => {
 			debug("GÅR DU IN I DENNA?");
